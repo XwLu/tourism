@@ -20,6 +20,7 @@ const places = {
   haizhiyunNorth: { name: "海之韵公园北门（港隆路）", kind: "sight", latlng: [38.910121, 121.711151], locationNote: "按港隆路北侧入口道路点标记。" },
   nanshan: { name: "南山路", kind: "sight", latlng: [38.909, 121.649] },
   guangfeng: { name: "光风街", kind: "sight", latlng: [38.904, 121.636] },
+  yuanyi: { name: "元气攀岩 Energy Climbing Gym", kind: "sight", latlng: [38.836, 121.365], approximate: true, locationNote: "高新园区七贤里文化创意产业园2号楼；出发前核对具体入口和营业时间。" },
   lianhuashan: { name: "莲花山索道·动物园北门", kind: "optional", latlng: [38.892, 121.610], approximate: true, locationNote: "动物园北门与莲花山观景台为不同入口，地图标记为北门集合点。" }
 };
 
@@ -86,12 +87,13 @@ const itinerary = [
     ]
   },
   {
-    id: "10-06", short: "10/6", label: "10 月 6 日 · 返程", summary: "莲花山可选；退房取行李，午餐待定，再去机场。", color: "#8877a4",
-    note: "建议 07:00 先退房并寄存行李；午餐暂不固定，最晚 11:30 从酒店片区出发去机场。若索道排队超过 30 分钟，直接取消索道并留出午餐与机场时间。",
+    id: "10-06", short: "10/6", label: "10 月 6 日 · 返程", summary: "莲花山可选；取行李后 11:00 元气攀岩探馆，13:15 出发去机场。", color: "#8877a4",
+    note: "建议 07:00 先退房并寄存行李；11:00–13:00 元气攀岩探馆，结束后 13:15 出发去机场。若索道排队超过 30 分钟，直接取消索道，不影响攀岩和航班。",
     stops: [
       { place: "lianhuashan", time: "07:30–09:30", detail: "可选：动物园北门—莲花山观景台；先寄存行李，确认开放与排队后才执行。", optional: true },
-      { place: "hotel", time: "09:30–11:30", detail: "回酒店取行李；午餐待定，最晚 11:30 从酒店片区出发去机场。" },
-      { place: "airport", time: "15:35 起飞", detail: "乘 HO2032 返回杭州，提前到机场办理值机。" }
+      { place: "hotel", time: "09:30–11:00", detail: "回酒店取行李；酒店与岩馆同在高新园区，距离不远。" },
+      { place: "yuanyi", time: "11:00–13:00", detail: "高新园区七贤里文化创意产业园2号楼探馆爬墙；与10月3日野攀同一家。" },
+      { place: "airport", time: "15:35 起飞", detail: "13:15 从岩馆打车去机场（约40分钟）；乘 HO2032 返回杭州，提前办理值机。" }
     ]
   }
 ];
