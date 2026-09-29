@@ -19,7 +19,7 @@ const places = {
   haizhiyunSouth: { name: "海之韵公园西南门（滨海北路）", kind: "sight", latlng: [38.892768, 121.701791], locationNote: "按滨海北路西南门道路点标记。" },
   haizhiyunNorth: { name: "海之韵公园北门（港隆路）", kind: "sight", latlng: [38.910121, 121.711151], locationNote: "按港隆路北侧入口道路点标记。" },
   nanshan: { name: "南山路", kind: "sight", latlng: [38.909, 121.649] },
-  yuanyi: { name: "元气攀岩 Energy Climbing Gym", kind: "sight", latlng: [38.836, 121.365], approximate: true, locationNote: "高新园区七贤里文化创意产业园2号楼；出发前核对具体入口和营业时间。" },
+  guangfeng: { name: "光风街", kind: "sight", latlng: [38.904, 121.636] },
   lianhuashan: { name: "莲花山索道·动物园北门", kind: "optional", latlng: [38.892, 121.610], approximate: true, locationNote: "动物园北门与莲花山观景台为不同入口，地图标记为北门集合点。" }
 };
 
@@ -74,14 +74,14 @@ const itinerary = [
     ]
   },
   {
-    id: "10-05", short: "10/5", label: "10 月 5 日 · 海之韵与攀岩探馆", summary: "上午海之韵，午餐澳深鱼市，下午南山路与元气攀岩探馆，晚餐新长兴。", color: "#5579a6",
+    id: "10-05", short: "10/5", label: "10 月 5 日 · 海之韵与市中心", summary: "上午海之韵，午餐澳深鱼市，下午市中心慢逛，晚餐新长兴。", color: "#5579a6",
     note: "澳深鱼市按海之韵北门/东港方向安排，新长兴按市中心回酒店方向安排；市场营业和加工档口以当天现场为准。",
     stops: [
       { place: "haizhiyunSouth", time: "09:00", detail: "打车到西南门，开始海之韵公园南进北出的约 3 小时路线。" },
       { place: "haizhiyunNorth", time: "约 12:00", detail: "从北门出园，前往海之韵北门/东港方向的澳深鱼市。" },
       { place: "aoshen", time: "12:15–13:30", detail: "海鲜盖饭午餐；按当天门店位置和排队情况就近用餐。" },
       { place: "nanshan", time: "14:00–15:00", detail: "选一段南山路 citywalk 和咖啡。" },
-      { place: "yuanyi", time: "16:00–18:00", detail: "从南山路打车前往高新园区七贤里文化创意产业园2号楼（约40分钟）；与10月3日野攀同一家，探馆爬墙。" },
+      { place: "guangfeng", time: "15:00–17:00", detail: "从桃源街站附近沿坡路向上逛；体力不足时与南山路二选一。" },
       { place: "xinchangxing", time: "19:15–20:30", detail: "在新长兴吃海鲜；市场营业和加工档口以当天现场为准，晚餐后回酒店。" }
     ]
   },
