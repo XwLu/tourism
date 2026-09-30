@@ -20,8 +20,7 @@ const places = {
   haizhiyunNorth: { name: "海之韵公园北门（港隆路）", kind: "sight", latlng: [38.910121, 121.711151], locationNote: "按港隆路北侧入口道路点标记。" },
   nanshan: { name: "南山路", kind: "sight", latlng: [38.909, 121.649] },
   guangfeng: { name: "光风街", kind: "sight", latlng: [38.904, 121.636] },
-  yuanyi: { name: "元气攀岩 Energy Climbing Gym", kind: "sight", latlng: [38.836, 121.365], approximate: true, locationNote: "高新园区七贤里文化创意产业园2号楼；出发前核对具体入口和营业时间。" },
-  lianhuashan: { name: "莲花山索道·动物园北门", kind: "optional", latlng: [38.892, 121.610], approximate: true, locationNote: "动物园北门与莲花山观景台为不同入口，地图标记为北门集合点。" }
+  yuanyi: { name: "元气攀岩 Energy Climbing Gym", kind: "sight", latlng: [38.836, 121.365], approximate: true, locationNote: "高新园区七贤里文化创意产业园2号楼；出发前核对具体入口和营业时间。" }
 };
 
 const itinerary = [
@@ -34,17 +33,17 @@ const itinerary = [
     ]
   },
   {
-    id: "10-02", short: "10/2", label: "10 月 2 日 · 丹东往返与正黄旗夜宵", summary: "丹东站—鸭绿江断桥—安东老街—丹东站，返回大连后去正黄旗延安路总店。", color: "#487ea8",
-    note: "丹东点位为市区道路示意；若断桥现场拥堵，优先保留江边观景并按时回站。21:05 到达大连后前往正黄旗，若排队过久则直接回酒店。",
+    id: "10-02", short: "10/2", label: "10 月 2 日 · 丹东往返与正黄旗晚餐", summary: "丹东站—鸭绿江断桥—安东老街（可选）—丹东站，返回大连后直接去正黄旗延安路总店，吃完再回酒店。", color: "#487ea8",
+    note: "丹东点位为市区道路示意；若断桥排队或交通拥堵，取消安东老街，优先保留江边观景并按时回站。21:05 到达大连后直接打车去正黄旗延安路总店，不先回酒店；若餐厅排队过久则跳过晚餐、直接回酒店。",
     stops: [
       { place: "station", time: "10:53", detail: "乘 D7757 从大连站出发前往丹东。" },
       { place: "dandongStation", time: "13:38", detail: "抵达丹东站；出站后直接前往鸭绿江断桥。" },
       { place: "yaluBridge", time: "14:05–15:20", detail: "鸭绿江断桥及江边观景，远眺中朝友谊桥；不安排游船。" },
-      { place: "andongOldStreet", time: "15:40–16:45", detail: "安东老街短线游览，可吃小吃；时间紧不追求逛完。" },
-      { place: "dandongStation", time: "17:15", detail: "最晚返回丹东站，预留安检和进站时间。" },
-      { place: "station", time: "21:05", detail: "乘 D7750 返回大连站后，打车前往酒店所在的高新万达片区。" },
-      { place: "zhenghuangqi", time: "21:45–22:45", detail: "正黄旗延安路总店吃海鲜；出发前确认国庆营业、排队和最晚接单。" },
-      { place: "hotel", time: "约 23:00", detail: "吃完夜宵步行或短途打车回酒店。" }
+      { place: "andongOldStreet", time: "15:40–16:45", detail: "可选短线游览、吃小吃，不另安排正式晚餐；时间紧或交通拥堵时取消。", optional: true },
+      { place: "dandongStation", time: "17:15", detail: "最晚返回丹东站，预留安检和进站时间；18:31 乘 D7750 返回大连。" },
+      { place: "station", time: "21:05–21:45", detail: "D7750 于 21:05 抵达大连站（以车票显示车站为准），出站后直接打车去正黄旗延安路总店，不先回酒店。" },
+      { place: "zhenghuangqi", time: "21:45–22:45", detail: "在正黄旗延安路总店吃海鲜，作为当天唯一晚餐安排；出发前确认国庆营业、排队和最晚接单，排队过久则直接回酒店。" },
+      { place: "hotel", time: "22:45–23:15", detail: "晚餐后从延安路总店打车回全季大连高新万达广场酒店，给返程留缓冲。" }
     ],
     routeSegments: [
       { places: ["station", "dandongStation"], dashArray: "4 8", color: "#487ea8" },
@@ -87,12 +86,11 @@ const itinerary = [
     ]
   },
   {
-    id: "10-06", short: "10/6", label: "10 月 6 日 · 返程", summary: "莲花山可选；取行李后 11:00 元气攀岩探馆，13:15 出发去机场。", color: "#8877a4",
-    note: "建议 07:00 先退房并寄存行李；11:00–13:00 元气攀岩探馆，结束后 13:15 出发去机场。若索道排队超过 30 分钟，直接取消索道，不影响攀岩和航班。",
+    id: "10-06", short: "10/6", label: "10 月 6 日 · 返程", summary: "酒店睡醒后退房，带好行李直接去元气攀岩；11:00–13:00 探馆，13:15 出发去机场。", color: "#8877a4",
+    note: "睡醒后收拾行李、办理退房，带好全部行李直达岩馆，不再返回酒店。提前确认岩馆入口、营业时间和行李临时存放安排；13:15 出发去机场，预留值机时间。",
     stops: [
-      { place: "lianhuashan", time: "07:30–09:30", detail: "可选：动物园北门—莲花山观景台；先寄存行李，确认开放与排队后才执行。", optional: true },
-      { place: "hotel", time: "09:30–11:00", detail: "回酒店取行李；酒店与岩馆同在高新园区，距离不远。" },
-      { place: "yuanyi", time: "11:00–13:00", detail: "高新园区七贤里文化创意产业园2号楼探馆爬墙；与10月3日野攀同一家。" },
+      { place: "hotel", time: "睡醒后", detail: "在酒店睡醒后收拾行李、办理退房，带好全部行李直接出发去元气攀岩。" },
+      { place: "yuanyi", time: "11:00–13:00", detail: "携带行李到高新园区七贤里文化创意产业园2号楼探馆爬墙；与10月3日野攀同一家。" },
       { place: "airport", time: "15:35 起飞", detail: "13:15 从岩馆打车去机场（约40分钟）；乘 HO2032 返回杭州，提前办理值机。" }
     ]
   }
