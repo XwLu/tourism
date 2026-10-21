@@ -1,11 +1,13 @@
-import { trips } from '../../data/trips';
 import { getCardColumns, toggleSaved } from '../../utils/travel';
+import { getTrips, refreshTrips } from '../../utils/trip-store';
 
 Page({
   data: {
     title: '好想全职旅攀',
     subtitle: '想去看海，想去攀岩，也想把日子过在路上。',
-    tripCount: trips.length,
+    tripCount: 0,
+    tripsLoading: false,
+    tripError: '',
     keyword: '',
     category: 'all',
     filters: [
@@ -20,9 +22,32 @@ Page({
   },
   onShow() {
     this.updateCards();
+    this.loadTrips();
+  },
+  onUnload() {
+    this.disposed = true;
+  },
+  async onPullDownRefresh() {
+    await this.loadTrips();
+    wx.stopPullDownRefresh();
+  },
+  async loadTrips() {
+    if (this.data.tripsLoading) return;
+    this.setData({ tripsLoading: true, tripError: '' });
+    try {
+      await refreshTrips();
+      if (!this.disposed) this.updateCards();
+    } catch (error) {
+      if (!this.disposed) this.setData({ tripError: error.message });
+    } finally {
+      if (!this.disposed) this.setData({ tripsLoading: false });
+    }
   },
   updateCards() {
-    this.setData(getCardColumns({ keyword: this.data.keyword, category: this.data.category }));
+    this.setData({
+      tripCount: getTrips().length,
+      ...getCardColumns({ keyword: this.data.keyword, category: this.data.category }),
+    });
   },
   onSearch(event) {
     this.setData({ keyword: event.detail.value });

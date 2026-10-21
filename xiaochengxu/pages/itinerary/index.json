@@ -1,4 +1,5 @@
 {
   "navigationBarTitleText": "旅行计划",
+  "enablePullDownRefresh": true,
   "usingComponents": { "insurance-notice": "/components/insurance-notice/index" }
 }

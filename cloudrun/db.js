@@ -37,6 +37,16 @@ function createDatabase(env = process.env) {
       }
     },
     close: () => pool.end(),
+    async listTrips() {
+      const rows = await query(
+        'SELECT trip_id AS id, content FROM travel_trips WHERE published = 1 ORDER BY sort_order, trip_id',
+      );
+      return rows.map((row) => {
+        const trip = typeof row.content === 'string' ? JSON.parse(row.content) : row.content;
+        if (!trip || trip.id !== row.id) throw new Error('旅行内容与数据库 ID 不一致');
+        return trip;
+      });
+    },
     async hasTripDay(tripId, dayId) {
       const rows =
         dayId === undefined

@@ -1,6 +1,7 @@
 import { getTrip, getDay, getDayText, getSavedIds, getStops, toggleSaved } from '../../utils/travel';
 import { getMapData } from '../../utils/coordinates';
 import { formatCommentTime, requestCommunity, saveCommunityProfile } from '../../utils/community';
+import { refreshTrips } from '../../utils/trip-store';
 
 function displayComments(comments) {
   return comments.map((comment) => ({
@@ -13,6 +14,8 @@ function displayComments(comments) {
 Page({
   data: {
     trip: null,
+    tripLoading: false,
+    tripError: '',
     days: [],
     day: null,
     stops: [],
@@ -43,13 +46,38 @@ Page({
     profileAction: '',
   },
   onLoad(options) {
-    const trip = getTrip(options.id);
-    if (!trip) return;
+    this.tripId = options.id;
+    this.initialDayId = options.day;
     this.commentDrafts = {};
     this.commentRequests = {};
-    this.setData({ trip, days: trip.days });
-    this.showDay(getDay(options.day, trip.id) || trip.days[0]);
+    this.renderTrip(options.day);
+  },
+  renderTrip(dayId) {
+    const trip = getTrip(this.tripId);
+    if (!trip) {
+      this.communitySequence = (this.communitySequence || 0) + 1;
+      this.setData({ trip: null, day: null, days: [], communityLoading: false });
+      return;
+    }
+    this.setData({ trip, days: trip.days, isSaved: getSavedIds().includes(trip.id) });
+    this.showDay(getDay(dayId, trip.id) || trip.days[0]);
     wx.setNavigationBarTitle({ title: `${trip.destination} · 旅行计划` });
+  },
+  async loadTrip() {
+    if (this.data.tripLoading) return;
+    this.setData({ tripLoading: true, tripError: '' });
+    try {
+      await refreshTrips();
+      if (!this.disposed) this.renderTrip(this.data.day ? this.data.day.id : this.initialDayId);
+    } catch (error) {
+      if (!this.disposed) this.setData({ tripError: error.message });
+    } finally {
+      if (!this.disposed) this.setData({ tripLoading: false });
+    }
+  },
+  async onPullDownRefresh() {
+    await this.loadTrip();
+    wx.stopPullDownRefresh();
   },
   showDay(day) {
     const { days } = this.data;
@@ -74,8 +102,8 @@ Page({
   onShow() {
     if (this.data.trip) {
       this.setData({ isSaved: getSavedIds().includes(this.data.trip.id) });
-      if (!this.data.communityLoading && !this.data.profileVisible) this.loadCommunity();
     }
+    this.loadTrip();
   },
   onUnload() {
     this.disposed = true;
@@ -282,7 +310,7 @@ Page({
   },
   selectDay(event) {
     const { id } = event.currentTarget.dataset;
-    const day = getDay(id, this.data.trip.id);
+    const day = this.data.days.find((item) => item.id === id);
     if (!day) return;
     this.showDay(day);
     wx.pageScrollTo({ scrollTop: 0, duration: 200 });

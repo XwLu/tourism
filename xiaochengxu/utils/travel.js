@@ -1,10 +1,10 @@
-import { trips } from '../data/trips';
+import { getTrips } from './trip-store';
 
 const savedStorageKey = 'travel-saved-trips-v1';
 const kinds = { transport: '交通', hotel: '住宿', meal: '餐饮', sight: '游览' };
 
 export function getTrip(id) {
-  return trips.find((trip) => trip.id === id);
+  return getTrips().find((trip) => trip.id === id);
 }
 
 export function getDay(id, tripId) {
@@ -15,7 +15,7 @@ export function getDay(id, tripId) {
 export function getSavedIds() {
   try {
     const stored = wx.getStorageSync(savedStorageKey);
-    return Array.isArray(stored) ? stored.filter((id) => !!getTrip(id)) : [];
+    return Array.isArray(stored) ? stored.filter((id) => typeof id === 'string') : [];
   } catch (error) {
     return [];
   }
@@ -39,7 +39,7 @@ export function toggleSaved(id) {
 export function getCardColumns({ keyword = '', category = 'all', savedOnly = false } = {}) {
   const savedIds = getSavedIds();
   const search = keyword.trim().toLowerCase();
-  const cards = trips
+  const cards = getTrips()
     .filter((trip) => !savedOnly || savedIds.includes(trip.id))
     .filter((trip) => category === 'all' || trip.categories.includes(category))
     .filter((trip) =>

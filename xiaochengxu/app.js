@@ -4,7 +4,7 @@ App({
     const updateManager = wx.getUpdateManager();
     updateManager.onUpdateReady(() => {
       wx.showModal({
-        title: '发现新行程',
+        title: '发现新版本',
         content: '新版本已经准备好，是否重新打开？',
         success(result) {
           if (result.confirm) updateManager.applyUpdate();

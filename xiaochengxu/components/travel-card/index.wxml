@@ -7,11 +7,6 @@
 >
   <view class="card-cover" style="height: {{trip.coverHeight}}rpx;">
     <image class="cover-image" src="{{trip.cover}}" mode="aspectFill" lazy-load />
-    <view class="cover-shade"></view>
-    <view class="day-badge">{{trip.duration}}</view>
-    <text class="cover-date">2026</text>
-    <view class="cover-words"><text wx:for="{{trip.coverTitle}}" wx:key="*this">{{item}}</text></view>
-    <text class="cover-city">{{trip.destination}}</text>
   </view>
   <view class="card-body">
     <view class="card-tags"><text wx:for="{{trip.tags}}" wx:key="*this"># {{item}}</text></view>

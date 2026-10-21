@@ -1,5 +1,6 @@
 {
   "navigationBarTitleText": "阿帆的旅行账本",
+  "enablePullDownRefresh": true,
   "usingComponents": {
     "travel-card": "/components/travel-card/index"
   }

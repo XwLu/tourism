@@ -1,3 +1,7 @@
+<view wx:if="{{tripLoading || tripError}}" class="trip-status">
+  <text>{{tripLoading ? '正在更新行程…' : trip ? '暂时无法更新，显示已有行程。' : tripError}}</text>
+  <button wx:if="{{tripError}}" class="trip-retry" bindtap="loadTrip">重新加载</button>
+</view>
 <block wx:if="{{trip}}">
   <view class="trip-intro">
     <text class="eyebrow">ONE TRIP, MANY LITTLE MOMENTS</text>
@@ -59,7 +63,7 @@
     >
     <view class="hero-copy"
       ><text wx:for="{{day.coverTitle}}" wx:key="*this">{{item}}</text
-      ><text class="hero-location">{{day.city}} · 2026 国庆</text></view
+      ><text class="hero-location">{{day.city}} · {{trip.shortDates}}</text></view
     >
   </view>
   <view class="detail-content">
@@ -69,9 +73,11 @@
     <insurance-notice wx:if="{{day.hasOutdoorClimbing}}" />
     <view class="route-card"
       ><text class="small-label">TODAY'S ROUTE / 今日路线</text><text class="route-text">{{day.route}}</text
-      ><button class="map-toggle" bindtap="toggleMap">{{showMap ? '收起路线地图 ↑' : '展开路线地图 ↗'}}</button></view
+      ><button wx:if="{{mapPoints.length}}" class="map-toggle" bindtap="toggleMap"
+        >{{showMap ? '收起路线地图 ↑' : '展开路线地图 ↗'}}</button
+      ></view
     >
-    <view wx:if="{{showMap}}" class="map-section">
+    <view wx:if="{{showMap && mapPoints.length}}" class="map-section">
       <map
         id="day-map"
         class="route-map"
@@ -118,7 +124,9 @@
         ><text class="practical-label">住宿</text
         ><view class="practical-value"
           ><text>{{day.stay}}</text
-          ><text wx:if="{{day.day !== 6}}" class="hotel-detail">{{trip.hotelDetail}}</text></view
+          ><text wx:if="{{day.stay !== '无' && trip.hotelDetail}}" class="hotel-detail"
+            >{{trip.hotelDetail}}</text
+          ></view
         ></view
       ></view
     >
@@ -260,6 +268,9 @@
     </view>
   </view>
 </block>
+<view wx:elif="{{tripLoading}}" class="empty-state">
+  <text class="empty-title">正在寻找这趟旅行…</text>
+</view>
 <view wx:else class="empty-state"
   ><text class="empty-symbol">⌕</text><text class="empty-title">这趟旅行暂时找不到</text
   ><text class="empty-description">回到首页，挑一个喜欢的日子。</text

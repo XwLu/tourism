@@ -1,6 +1,6 @@
 # 微信云托管：阿帆的旅行账本
 
-本目录是可独立部署的 Express 服务，替换 `express-1zah` 中原来的计数器示例。小程序已对接 `/api/community`；只有部署成功后，报名与反馈才会在不同用户之间共享。
+本目录是可独立部署的 Express 服务，替换 `express-1zah` 中原来的计数器示例。小程序通过 `GET /api/trips` 从数据库读取完整行程，通过 `POST /api/community` 共享报名与每日反馈。两类接口均使用微信云调用身份，不提供客户端写入行程的接口。
 
 | 项目 | 值 |
 | --- | --- |
@@ -31,7 +31,7 @@
 CREATE DATABASE IF NOT EXISTS nodejs_demo CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-服务启动时自动创建 `travel_trip_days`、`travel_profiles`、`travel_members`、`travel_comments` 四张表，并补入大连六天的登记记录，不修改计数器表，不清空已有报名和评论。也可以先选中目标库手动执行本目录的 `schema.sql`。
+服务启动时自动创建 `travel_trips`、`travel_trip_days`、`travel_profiles`、`travel_members`、`travel_comments` 五张表，不修改计数器表，不清空已有报名和评论。`travel_trips` 保存整趟旅行及全部日期的 JSON 内容；服务重启只建表，不覆盖已发布的正文。首次启用时还需执行本目录生成的 `trip-registry.sql` 导入完整行程，目前包含大连六日、临安狮子岩一日两趟旅行；仅执行 `schema.sql` 不会导入正文。
 
 ## 2. 配置微信云调用
 
@@ -64,6 +64,7 @@ CREATE DATABASE IF NOT EXISTS nodejs_demo CHARACTER SET utf8mb4 COLLATE utf8mb4_
 3. 用账号 B 打开相同行程，能看到 A 的报名头像和 10 月 1 日的反馈；B 不能删除 A 的反馈。
 4. 同一账号重复点击或网络重试不会重复报名、重复创建同一条反馈。
 5. 重启服务或重新部署后，记录仍从 MySQL 读取。
+6. 在数据库发布修改后的行程，下拉刷新首页和详情页即可看到新内容；断网后保留最近成功缓存，并显示当前未更新的提示。从微信分享打开数据库新增的旅行也能读取，无需包内存在该旅行。
 
 微信后台的最低基础库至少设为 `2.26.0`，以支持云托管调用和头像压缩参数；当前项目调试基础库为 `3.7.8`。
 
@@ -73,31 +74,40 @@ CREATE DATABASE IF NOT EXISTS nodejs_demo CHARACTER SET utf8mb4 COLLATE utf8mb4_
 
 头像压缩为 128 × 128 的 JPEG 缩略图后保存在 MySQL，与资料和评论一起持久化。头像单独通过云调用读取，在设备上只缓存图片，不额外要求开通对象存储；清理图片缓存不会删除云端记录。旧的本机反馈不会自动上传。
 
-MySQL 和容器均使用已开通环境里的资源，实际费用按控制台套餐和用量计算。这里不要求另开云开发环境。允许报名的旅行和日期保存在 MySQL 的 `travel_trip_days` 表中，每次请求直接查询数据库，新增登记无需重启服务或重新发布后端。
+MySQL 和容器均使用已开通环境里的资源，实际费用按控制台套餐和用量计算。这里不要求另开云开发环境。完整行程保存在 `travel_trips`，接口每次直接查询已上架内容，不使用容器文件或服务端缓存。允许报名的旅行和日期保存在 `travel_trip_days`，与内容同时发布。
 
-## 新增旅行时无需重新部署后端
+## 首次启用联网行程
 
-本次升级需要上传新的后端代码包并发布一次。升级会自动增加行程登记表，现有大连行程、报名和评论继续使用原有 ID，不需要重新报名。旧的 `trips.json` 已移除。
+1. 在本目录运行 `npm run trip-sql`，打开「MySQL → 数据库管理」，选中 `MYSQL_DATABASE` 对应的库，执行生成的 `trip-registry.sql`。文件会补建行程表并导入当前所有旅行正文和日期，目前为两趟旅行、七个日期；可以重复执行，不删除已有报名和评论。
+2. 按第 3 节上传新的 `cloudrun-deploy.zip` 并发布，沿用现有环境变量。新版本必须包含 `trip-content.js`；Dockerfile 已同步更新。
+3. 在开发者工具重新编译小程序，验证后上传体验版；正式版按微信流程审核、发布。这一步只需在首次切换联网行程时进行。
+4. 用另一个微信账号验证行程、报名和评论，再在数据库更新一处文字，下拉刷新确认内容变化。
 
-以后新增旅行，流程如下：
+现有大连行程、报名和评论继续使用原有 ID，不需要重新报名。没有云端数据库连接或已登录的控制台时，本地生成 SQL 不代表已经写入云端；需在控制台执行后查询验证。
+
+## 新增或修改旅行无需重新发版
 
 1. 在 `../xiaochengxu/data/` 添加旅行数据，并在 `data/trips.js` 登记旅行列表。
 2. 在本目录运行 `npm run trip-sql`（需要 Node.js 22 或更高版本），生成 `trip-registry.sql`。
-3. 打开云托管「MySQL → 数据库管理」，选中 `MYSQL_DATABASE` 对应的数据库，将生成的 SQL 粘贴到 SQL 窗口执行。它只补充登记记录，可以重复执行，不删除已有报名和评论。
-4. 上传新的小程序体验版；正式版按微信流程审核、发布。云托管服务不需要重新部署。
+3. 在云托管 MySQL 目标库执行该文件。生成器校验完整内容，使用十六进制 UTF-8 字面量保存中文、引号及换行，不依赖数据库的反斜杠转义模式；正文及日期登记在同一事务内更新。
+4. 重新进入小程序或下拉刷新，即可看到新旅行及修改内容。无需重新发布小程序，也无需重新部署后端。
 
-例如，登记一趟新旅行的两个日期，可以直接执行：
+修改已有旅行也执行相同步骤；ID 保持不变，原有报名和评论即可继续关联。生成器不会删除本地入口中已经移除的旧旅行和日期；下架旅行请执行：
 
 ```sql
-INSERT INTO travel_trip_days (trip_id, day_id) VALUES
-  ('beijing-20270501', '05-01'),
-  ('beijing-20270501', '05-02')
-ON DUPLICATE KEY UPDATE day_id = VALUES(day_id);
+UPDATE travel_trips SET published = 0 WHERE trip_id = 'dalian-20261001';
 ```
 
-其中 ID 必须与小程序数据完全一致。旅行 ID 支持 1–64 个小写字母、数字、下划线和短横线；日期 ID 支持同样字符，长度为 1–16。未登记的旅行或日期仍然不能报名、评论。登记操作在数据库控制台完成，小程序用户没有新增登记的接口。
+下架仅隐藏行程列表和详情，不删除历史报名和评论。再次生成并执行包含该旅行的 SQL 会恢复上架。验证发布结果：
 
-新增日期同样只需生成并执行登记 SQL。生成器只补充当前数据中的记录，不会自动删除已经移除的日期，也不会修改用户反馈。行程正文目前仍随小程序打包，因此本次升级消除的是后端发布步骤；修改接口或功能代码时才需要重新发布后端。
+```sql
+SELECT trip_id, JSON_UNQUOTE(JSON_EXTRACT(content, '$.title')) AS title,
+       JSON_LENGTH(JSON_EXTRACT(content, '$.days')) AS days, published, updated_at
+FROM travel_trips ORDER BY sort_order, trip_id;
+SELECT trip_id, day_id FROM travel_trip_days ORDER BY trip_id, day_id;
+```
+
+旅行 ID 支持 1–64 个小写字母、数字、下划线和短横线；日期 ID 长度为 1–16。未登记的旅行或日期仍不能报名、评论。封面可复用现有包内图片，或使用已配置合法域名的 HTTPS 图片。新增包内图片、页面布局或功能代码仍需发版；本方案免除的是行程内容更新时的发布。
 
 ## 常见问题
 

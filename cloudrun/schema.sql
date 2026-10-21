@@ -4,6 +4,14 @@ CREATE TABLE IF NOT EXISTS travel_trip_days (
   PRIMARY KEY (trip_id, day_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS travel_trips (
+  trip_id VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY,
+  content JSON NOT NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  published TINYINT(1) NOT NULL DEFAULT 1,
+  updated_at TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 INSERT IGNORE INTO travel_trip_days (trip_id, day_id) VALUES
   ('dalian-20261001', '10-01'),
   ('dalian-20261001', '10-02'),

@@ -43,6 +43,10 @@
     ><view><text class="section-title">旅行计划</text><text class="heading-decoration"> / ON THE ROAD</text></view
     ><text class="section-caption">{{resultCount}} 趟旅行</text></view
   >
+  <view wx:if="{{tripsLoading || tripError}}" class="trip-status">
+    <text>{{tripsLoading ? '正在更新行程…' : '暂时无法更新，先看看已有行程。'}}</text>
+    <button wx:if="{{tripError}}" class="trip-retry" bindtap="loadTrips">重新加载</button>
+  </view>
   <view wx:if="{{resultCount}}" class="waterfall">
     <view class="waterfall-column"
       ><travel-card wx:for="{{leftColumn}}" wx:key="id" trip="{{item}}" bind:favorite="toggleFavorite"
@@ -51,7 +55,7 @@
       ><travel-card wx:for="{{rightColumn}}" wx:key="id" trip="{{item}}" bind:favorite="toggleFavorite"
     /></view>
   </view>
-  <view wx:else class="empty-state"
+  <view wx:elif="{{!tripsLoading}}" class="empty-state"
     ><text class="empty-symbol">⌕</text><text class="empty-title">这趟旅行还没找到</text
     ><text class="empty-description">换个地点或关键词，再找找看。</text
     ><button class="quiet-button" bindtap="resetFilters">查看全部旅行</button></view
