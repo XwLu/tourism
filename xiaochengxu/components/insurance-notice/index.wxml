@@ -1,0 +1,12 @@
+<view class="insurance-notice">
+  <text class="insurance-title">野攀前，记得买保险</text>
+  <text class="insurance-description">行程含野攀，请提前购买户外保险。</text>
+  <view class="insurance-timing">
+    <text class="insurance-effective">第二天生效</text>
+    <text class="insurance-description">请至少提前一天购买</text>
+  </view>
+  <button class="insurance-qr-button" bindtap="previewQrCode" aria-label="放大京东安联户外保险购买二维码">
+    <image class="insurance-qr" src="{{qrCode}}" mode="widthFix" show-menu-by-longpress />
+  </button>
+  <text class="insurance-caption">京东安联户外保险 · 点击放大，长按识别二维码</text>
+</view>

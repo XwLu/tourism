@@ -1,0 +1,23 @@
+{
+  "pages": ["pages/home/index", "pages/saved/index", "pages/itinerary/index"],
+  "window": {
+    "backgroundColor": "#f8f7f4",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#f8f7f4",
+    "navigationBarTitleText": "阿帆的旅行账本",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#8b8b87",
+    "selectedColor": "#df5149",
+    "backgroundColor": "#ffffff",
+    "list": [
+      { "pagePath": "pages/home/index", "text": "发现行程" },
+      { "pagePath": "pages/saved/index", "text": "我的收藏" }
+    ]
+  },
+  "resolveAlias": { "~/*": "/*" },
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

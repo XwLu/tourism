@@ -1,0 +1,29 @@
+<view
+  class="travel-card"
+  bindtap="openItinerary"
+  hover-class="travel-card--pressed"
+  aria-role="button"
+  aria-label="{{trip.title}}，查看完整旅行"
+>
+  <view class="card-cover" style="height: {{trip.coverHeight}}rpx;">
+    <image class="cover-image" src="{{trip.cover}}" mode="aspectFill" lazy-load />
+    <view class="cover-shade"></view>
+    <view class="day-badge">{{trip.duration}}</view>
+    <text class="cover-date">2026</text>
+    <view class="cover-words"><text wx:for="{{trip.coverTitle}}" wx:key="*this">{{item}}</text></view>
+    <text class="cover-city">{{trip.destination}}</text>
+  </view>
+  <view class="card-body">
+    <view class="card-tags"><text wx:for="{{trip.tags}}" wx:key="*this"># {{item}}</text></view>
+    <text class="card-title">{{trip.title}}</text>
+    <view class="card-footer">
+      <view class="card-author"><view class="author-dot"></view><text>{{trip.shortDates}}</text></view>
+      <button
+        class="save-button {{trip.isSaved ? 'is-saved' : ''}}"
+        catchtap="toggleFavorite"
+        aria-label="{{trip.isSaved ? '取消收藏' : '收藏旅行'}}"
+        ><text>{{trip.isSaved ? '♥' : '♡'}}</text></button
+      >
+    </view>
+  </view>
+</view>

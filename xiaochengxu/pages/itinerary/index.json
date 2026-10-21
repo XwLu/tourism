@@ -1,0 +1,4 @@
+{
+  "navigationBarTitleText": "旅行计划",
+  "usingComponents": { "insurance-notice": "/components/insurance-notice/index" }
+}

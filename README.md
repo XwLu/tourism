@@ -2,37 +2,46 @@
 
 这是一个用于记录和查看 2026 年国庆大连、丹东行程的静态网页项目。页面以日期为单位展示景点、酒店、交通和餐饮安排，并在可缩放的 Leaflet 地图上标注地点和路线。
 
+## 微信小程序
+
+`xiaochengxu/` 是对应的原生行程小程序「阿帆的旅行账本」，首页标题为「好想全职旅攀」，按整趟旅行展示卡片，目前只有大连·丹东一个计划。进入后切换日期查看六天的时间线、交通住宿和提醒，并支持旅行收藏、文字复制及路线地图。
+
+使用微信开发者工具导入 `xiaochengxu/`，选择「普通编译」预览。内容维护在 `xiaochengxu/data/dalian.js`，详细说明见 [小程序 README](./xiaochengxu/README.md)。目前小程序与网页各自维护数据，Netlify 部署不会自动发布小程序。
+
+小程序详情页支持整趟旅行报名及每日游玩反馈，最近三位报名成员的头像显示在日期选择栏上方。多人共享使用微信云托管与 MySQL，服务端源码在 `cloudrun/`，配置和部署步骤见 [云托管部署](./cloudrun/README.md)。新增旅行只需更新小程序和数据库的行程登记记录，无需重新部署后端。
+
 ## 项目结构
 
 ```text
 tourism/
 ├── README.md
 ├── .gitignore
-└── dalian-20261001/
-    ├── dalian-travel-plan.md       # 完整的文字行程和待确认事项
-    └── web/                        # Netlify 发布目录
-        ├── index.html              # 网页入口、页面布局和样式
-        └── map-assets/
-            ├── dalian-map.js       # 地点、每日行程、路线和交互逻辑
-            ├── leaflet.js          # Leaflet 地图库
-            ├── leaflet.css         # Leaflet 样式
-            ├── dalian-boundary.json # 大连城区边界数据
-            ├── dalian-roads.json   # 大连道路示意数据
-            └── LEAFLET-LICENSE.txt # Leaflet 许可说明
+├── AGENTS.md                       # 行程维护与数据库登记规则
+├── netlify.toml                    # 网页发布目录配置
+├── docs/                           # 共用资料及保险二维码源图
+├── cloudrun/                       # 微信云托管后端
+├── xiaochengxu/                    # 原生微信小程序
+└── plans/                          # 各趟旅行计划
+    └── dalian-20261001/
+        ├── dalian-travel-plan.md   # 完整的文字行程和待确认事项
+        └── web/                    # Netlify 发布目录
+            ├── index.html          # 网页入口、页面布局和样式
+            ├── assets/             # 网页使用的保险二维码副本
+            └── map-assets/         # Leaflet、地图数据和行程逻辑
 ```
 
 ## 网页工作机制
 
 ### 1. 页面入口
 
-Netlify 和本地预览都以 `dalian-20261001/web/index.html` 为入口。它负责：
+Netlify 和本地预览都以 `plans/dalian-20261001/web/index.html` 为入口。它负责：
 
 - 加载本地的 Leaflet CSS 和 JavaScript；
 - 加载 `map-assets/dalian-map.js` 中的行程数据和交互逻辑；
 - 创建日期筛选栏、左侧行程列表和右侧地图；
 - 在桌面端左右分栏，在手机端切换为上下布局。
 
-项目没有前端框架、数据库或后端服务，发布的是可直接由浏览器访问的静态文件。
+网页部分没有前端框架、数据库或后端服务，发布的是可直接由浏览器访问的静态文件；小程序的报名和评论使用单独部署的云托管后端。
 
 ### 2. 行程数据和页面渲染
 
@@ -69,7 +78,7 @@ Netlify 和本地预览都以 `dalian-20261001/web/index.html` 为入口。它�
 由于页面会通过 `fetch()` 加载 JSON，建议使用本地 HTTP 服务，而不是直接双击 HTML 文件：
 
 ```bash
-python3 -m http.server 8765 --directory dalian-20261001/web
+python3 -m http.server 8765 --directory plans/dalian-20261001/web
 ```
 
 然后在浏览器打开：
@@ -88,17 +97,17 @@ http://127.0.0.1:8765/
 git@github.com:XwLu/tourism.git
 ```
 
-默认分支是 `main`。Netlify 已连接这个 GitHub 仓库，发布目录配置为：
+默认分支是 `main`。Netlify 已连接这个 GitHub 仓库，根目录的 `netlify.toml` 将发布目录配置为：
 
 ```text
-dalian-20261001/web
+plans/dalian-20261001/web
 ```
 
 这是一个静态站点，因此 Netlify 的主要配置是：
 
 - **生产分支：** `main`
 - **构建命令：** 留空
-- **发布目录：** `dalian-20261001/web`
+- **发布目录：** `plans/dalian-20261001/web`
 
 自动部署流程如下：
 
@@ -108,7 +117,7 @@ flowchart LR
     B --> C[git push origin main]
     C --> D[GitHub push 事件]
     D --> E[Netlify Webhook / GitHub App]
-    E --> F[Netlify 发布 dalian-20261001/web]
+    E --> F[Netlify 发布 plans/dalian-20261001/web]
     F --> G[Netlify CDN 提供网页]
 ```
 
@@ -118,13 +127,13 @@ Netlify 主要通过 GitHub 的 push 事件通知触发部署，而不是按固�
 
 ## 日常更新流程
 
-1. 修改 `dalian-20261001/web/map-assets/dalian-map.js` 中的地点或行程数据；
-2. 如果需要修改页面标题、布局或样式，编辑 `dalian-20261001/web/index.html`；
+1. 修改 `plans/dalian-20261001/web/map-assets/dalian-map.js` 中的地点或行程数据；
+2. 如果需要修改页面标题、布局或样式，编辑 `plans/dalian-20261001/web/index.html`；
 3. 本地启动 HTTP 服务并检查日期筛选、地图缩放、地点提示和路线；
 4. 提交并推送到 `main`：
 
    ```bash
-   git add README.md dalian-20261001
+   git add README.md netlify.toml plans/dalian-20261001
    git commit -m "Update travel itinerary"
    git push origin main
    ```

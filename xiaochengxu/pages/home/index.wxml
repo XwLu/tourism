@@ -1,0 +1,63 @@
+<view class="page-shell">
+  <view class="journal-header">
+    <view class="journal-kicker"
+      ><view class="brand-dot"></view><text class="eyebrow">A LITTLE TRAVEL JOURNAL</text></view
+    >
+    <view class="heading-row"
+      ><text class="journal-title">{{title}}</text
+      ><view class="holiday-stamp"><text>想走</text><text>就出发</text></view></view
+    >
+    <text class="journal-subtitle">{{subtitle}}</text>
+    <view class="trip-meta"
+      ><text>{{tripCount}} 个旅行计划</text><view class="meta-dot"></view><text>记录每一次出发</text
+      ><text class="duration">山海与攀岩</text></view
+    >
+  </view>
+  <view class="search-box">
+    <view class="search-icon"></view>
+    <input
+      class="search-input"
+      value="{{keyword}}"
+      placeholder="想去哪里，或想攀哪块岩？"
+      placeholder-class="search-placeholder"
+      bindinput="onSearch"
+      confirm-type="search"
+      maxlength="60"
+      aria-label="搜索旅行"
+    />
+    <button wx:if="{{keyword}}" class="clear-search" bindtap="resetFilters" aria-label="清空搜索">×</button>
+  </view>
+  <scroll-view class="filter-scroll" scroll-x enhanced show-scrollbar="{{false}}"
+    ><view class="filter-list"
+      ><button
+        wx:for="{{filters}}"
+        wx:key="id"
+        class="filter-chip {{category === item.id ? 'filter-chip--active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="selectCategory"
+        >{{item.label}}</button
+      ></view
+    ></scroll-view
+  >
+  <view class="section-heading"
+    ><view><text class="section-title">旅行计划</text><text class="heading-decoration"> / ON THE ROAD</text></view
+    ><text class="section-caption">{{resultCount}} 趟旅行</text></view
+  >
+  <view wx:if="{{resultCount}}" class="waterfall">
+    <view class="waterfall-column"
+      ><travel-card wx:for="{{leftColumn}}" wx:key="id" trip="{{item}}" bind:favorite="toggleFavorite"
+    /></view>
+    <view class="waterfall-column"
+      ><travel-card wx:for="{{rightColumn}}" wx:key="id" trip="{{item}}" bind:favorite="toggleFavorite"
+    /></view>
+  </view>
+  <view wx:else class="empty-state"
+    ><text class="empty-symbol">⌕</text><text class="empty-title">这趟旅行还没找到</text
+    ><text class="empty-description">换个地点或关键词，再找找看。</text
+    ><button class="quiet-button" bindtap="resetFilters">查看全部旅行</button></view
+  >
+  <view class="journal-footer"
+    ><view class="footer-line"></view><text>行程有安排，旅行留一点空白。</text
+    ><text class="footer-year">TRAVEL &amp; CLIMB · 2026</text></view
+  >
+</view>

@@ -1,0 +1,22 @@
+<view class="page-shell">
+  <view class="saved-header"
+    ><text class="eyebrow">KEEP THE LITTLE MOMENTS</text><text class="saved-title">想去的，都留在这里。</text
+    ><text class="saved-description">点亮一颗心，把想去的旅行收进口袋。</text></view
+  >
+  <view class="section-heading"
+    ><text class="section-title">收藏的旅行</text><text class="section-caption">{{resultCount}} 趟旅行</text></view
+  >
+  <view wx:if="{{resultCount}}" class="waterfall">
+    <view class="waterfall-column"
+      ><travel-card wx:for="{{leftColumn}}" wx:key="id" trip="{{item}}" bind:favorite="toggleFavorite"
+    /></view>
+    <view class="waterfall-column"
+      ><travel-card wx:for="{{rightColumn}}" wx:key="id" trip="{{item}}" bind:favorite="toggleFavorite"
+    /></view>
+  </view>
+  <view wx:else class="empty-state"
+    ><text class="empty-symbol">♡</text><text class="empty-title">口袋里，先留一点空位</text
+    ><text class="empty-description">在旅行卡片上点一下爱心，下次就能在这里找到它。</text
+    ><button class="quiet-button" bindtap="goDiscover">去看看旅行</button></view
+  >
+</view>

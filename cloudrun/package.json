@@ -1,0 +1,19 @@
+{
+  "name": "travel-journal-cloudrun",
+  "version": "1.0.0",
+  "private": true,
+  "description": "阿帆的旅行账本：微信云托管报名与每日反馈服务",
+  "main": "index.js",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "trip-sql": "node --experimental-vm-modules scripts/generate-trip-sql.mjs"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "mysql2": "^3.15.3",
+    "sharp": "^0.34.4"
+  }
+}

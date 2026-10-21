@@ -1,0 +1,71 @@
+:host {
+  display: block;
+  margin: 28rpx 0;
+}
+
+.insurance-notice {
+  padding: 30rpx 24rpx;
+  border: 1rpx solid #e5d5ba;
+  border-radius: 20rpx;
+  background: #fff9ee;
+  text-align: center;
+}
+
+.insurance-title,
+.insurance-description,
+.insurance-effective,
+.insurance-caption {
+  display: block;
+}
+
+.insurance-title {
+  color: #6b5134;
+  font-size: 29rpx;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.insurance-description {
+  margin-top: 8rpx;
+  color: #8b765a;
+  font-size: 24rpx;
+  line-height: 1.7;
+}
+
+.insurance-timing {
+  margin: 24rpx 0 18rpx;
+}
+
+.insurance-effective {
+  color: #b65a32;
+  font-size: 34rpx;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.insurance-qr-button {
+  box-sizing: border-box;
+  width: 360rpx;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 18rpx;
+  border-radius: 14rpx;
+  background: #fff;
+  line-height: 1;
+}
+
+.insurance-qr-button::after {
+  border: 0;
+}
+
+.insurance-qr {
+  display: block;
+  width: 100%;
+}
+
+.insurance-caption {
+  margin-top: 18rpx;
+  color: #8b765a;
+  font-size: 21rpx;
+  line-height: 1.7;
+}

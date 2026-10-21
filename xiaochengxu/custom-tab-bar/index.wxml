@@ -1,0 +1,17 @@
+<view class="travel-tab-bar">
+  <view
+    wx:for="{{tabs}}"
+    wx:key="path"
+    class="tab-item {{selected === item.path ? 'tab-item--active' : ''}}"
+    data-path="{{item.path}}"
+    bindtap="switchTab"
+    aria-role="button"
+    aria-label="{{item.label}}"
+  >
+    <view wx:if="{{item.icon === 'discover'}}" class="discover-icon"
+      ><view></view><view></view><view></view><view></view
+    ></view>
+    <text wx:else class="saved-icon">♡</text>
+    <text class="tab-label">{{item.label}}</text><view class="active-dot"></view>
+  </view>
+</view>

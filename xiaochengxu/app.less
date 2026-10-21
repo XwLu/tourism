@@ -1,0 +1,105 @@
+page {
+  background: #f8f7f4;
+  color: #26332f;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 28rpx;
+  -webkit-font-smoothing: antialiased;
+}
+
+view,
+button,
+input,
+scroll-view {
+  box-sizing: border-box;
+}
+
+button {
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font-size: inherit;
+  font-weight: normal;
+  line-height: inherit;
+}
+
+button::after {
+  border: 0;
+}
+
+.page-shell {
+  padding: 24rpx 28rpx calc(160rpx + env(safe-area-inset-bottom));
+}
+
+.eyebrow {
+  display: block;
+  color: #9a8170;
+  font-size: 19rpx;
+  font-weight: 600;
+  letter-spacing: 5rpx;
+}
+
+.waterfall {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.waterfall-column {
+  width: calc(50% - 8rpx);
+  min-width: 0;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 34rpx 0 22rpx;
+}
+
+.section-title {
+  font-size: 31rpx;
+  font-weight: 650;
+}
+
+.section-caption {
+  color: #93958e;
+  font-size: 22rpx;
+}
+
+.empty-state {
+  padding: 90rpx 32rpx;
+  text-align: center;
+}
+
+.empty-symbol {
+  display: block;
+  margin-bottom: 20rpx;
+  color: #d5a292;
+  font-size: 80rpx;
+}
+
+.empty-title {
+  display: block;
+  margin-bottom: 14rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.empty-description {
+  display: block;
+  color: #96958e;
+  font-size: 25rpx;
+  line-height: 1.8;
+}
+
+.quiet-button {
+  display: inline-block;
+  margin-top: 30rpx;
+  padding: 18rpx 34rpx;
+  border-radius: 40rpx;
+  background: #eaf0e9;
+  color: #496454;
+  font-size: 25rpx;
+}

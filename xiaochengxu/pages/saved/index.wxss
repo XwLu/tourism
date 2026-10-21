@@ -1,0 +1,16 @@
+.saved-header {
+  padding: 20rpx 8rpx 30rpx;
+}
+.saved-title {
+  display: block;
+  margin-top: 28rpx;
+  font-size: 45rpx;
+  font-weight: 650;
+  line-height: 1.5;
+}
+.saved-description {
+  display: block;
+  margin-top: 18rpx;
+  color: #929488;
+  font-size: 25rpx;
+}

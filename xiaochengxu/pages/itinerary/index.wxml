@@ -1,0 +1,267 @@
+<block wx:if="{{trip}}">
+  <view class="trip-intro">
+    <text class="eyebrow">ONE TRIP, MANY LITTLE MOMENTS</text>
+    <text class="trip-title">{{trip.title}}</text>
+    <text class="trip-description">{{trip.subtitle}}</text>
+    <view class="trip-facts"
+      ><text>{{trip.dates}}</text
+      ><text>{{trip.duration}} · {{memberCount === null ? '同行人数待更新' : memberCount + ' 人同行'}}</text></view
+    >
+    <view class="enrollment-row">
+      <view class="enrollment-members">
+        <view wx:if="{{members.length}}" class="member-avatars">
+          <view wx:for="{{members}}" wx:key="id" class="member-avatar" aria-label="{{item.nickName}}">
+            <image wx:if="{{item.avatarUrl}}" src="{{item.avatarUrl}}" mode="aspectFill" />
+            <text wx:else>{{item.initial}}</text>
+          </view>
+        </view>
+        <view class="enrollment-copy">
+          <text class="enrollment-title">{{memberCount ? memberCount + ' 位旅伴已报名' : '一起出发吧'}}</text>
+          <text class="enrollment-caption">{{communityLoading ? '正在寻找旅伴…' : '整趟旅行 · 同行成员'}}</text>
+        </view>
+      </view>
+      <button
+        class="enrollment-button {{isJoined ? 'enrollment-button--joined' : ''}}"
+        type="primary"
+        bindtap="startJoin"
+        loading="{{joining}}"
+        disabled="{{joining || isJoined || communityLoading}}"
+        >{{isJoined ? '已报名' : '我要报名'}}</button
+      >
+    </view>
+  </view>
+  <scroll-view
+    class="day-picker"
+    scroll-x
+    enhanced
+    show-scrollbar="{{false}}"
+    scroll-into-view="day-tab-{{day.id}}"
+    scroll-with-animation
+  >
+    <view class="day-tabs"
+      ><button
+        wx:for="{{days}}"
+        wx:key="id"
+        id="day-tab-{{item.id}}"
+        class="day-tab {{day.id === item.id ? 'day-tab--active' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="selectDay"
+        ><text class="day-tab-number">DAY {{item.day}}</text><text>{{item.shortDate}}</text></button
+      ></view
+    >
+  </scroll-view>
+  <view class="detail-hero">
+    <image class="hero-image" src="{{day.cover}}" mode="aspectFill" />
+    <view class="hero-shade"></view>
+    <view class="hero-topline"
+      ><text class="hero-day">DAY {{day.day}} / {{days.length}}</text
+      ><text>{{day.shortDate}} · {{day.weekday}}</text></view
+    >
+    <view class="hero-copy"
+      ><text wx:for="{{day.coverTitle}}" wx:key="*this">{{item}}</text
+      ><text class="hero-location">{{day.city}} · 2026 国庆</text></view
+    >
+  </view>
+  <view class="detail-content">
+    <view class="detail-tags"><text wx:for="{{day.tags}}" wx:key="*this"># {{item}}</text></view>
+    <text class="detail-title">{{day.title}}</text>
+    <text class="detail-summary">{{day.summary}}</text>
+    <insurance-notice wx:if="{{day.hasOutdoorClimbing}}" />
+    <view class="route-card"
+      ><text class="small-label">TODAY'S ROUTE / 今日路线</text><text class="route-text">{{day.route}}</text
+      ><button class="map-toggle" bindtap="toggleMap">{{showMap ? '收起路线地图 ↑' : '展开路线地图 ↗'}}</button></view
+    >
+    <view wx:if="{{showMap}}" class="map-section">
+      <map
+        id="day-map"
+        class="route-map"
+        latitude="{{mapLatitude}}"
+        longitude="{{mapLongitude}}"
+        markers="{{markers}}"
+        include-points="{{mapPoints}}"
+        polyline="{{polyline}}"
+        scale="11"
+        enable-scroll
+        enable-zoom
+        enable-rotate="{{false}}"
+        show-location="{{false}}"
+      />
+      <text class="map-note"
+        >地点与虚线仅为行程顺序示意，并非导航路线；门店和入口以当天核对为准，地址待核实的餐厅未精确标记。</text
+      >
+    </view>
+    <view class="section-heading"
+      ><text class="section-title">这一天，这样过</text
+      ><text class="section-caption">{{stops.length}} 站安排</text></view
+    >
+    <view class="timeline">
+      <view wx:for="{{stops}}" wx:key="id" class="timeline-stop kind-{{item.kind}}">
+        <view class="timeline-number">{{item.sequence}}</view>
+        <view class="stop-body">
+          <view class="stop-topline"
+            ><text class="stop-time">{{item.time}}</text
+            ><text class="kind-tag {{item.optional ? 'optional-tag' : ''}}"
+              >{{item.optional ? '可选安排' : item.kindLabel}}</text
+            ></view
+          >
+          <text class="stop-title">{{item.name}}</text><text class="stop-detail">{{item.detail}}</text>
+          <text wx:if="{{item.locationNote}}" class="location-note">{{item.locationNote}}</text>
+          <button class="copy-place" data-name="{{item.name}}" bindtap="copyPlace">复制地点名称 ↗</button>
+        </view>
+      </view>
+    </view>
+    <view class="practical-card"
+      ><text class="section-title">交通与落脚处</text
+      ><view class="practical-row"
+        ><text class="practical-label">交通</text><text class="practical-value">{{day.transport}}</text></view
+      ><view class="practical-row"
+        ><text class="practical-label">住宿</text
+        ><view class="practical-value"
+          ><text>{{day.stay}}</text
+          ><text wx:if="{{day.day !== 6}}" class="hotel-detail">{{trip.hotelDetail}}</text></view
+        ></view
+      ></view
+    >
+    <view class="note-card"
+      ><view class="note-heading"><text class="note-star">✳</text><text>出发前，再看一眼</text></view
+      ><text class="note-text">{{day.note}}</text></view
+    >
+    <view class="comments-section">
+      <view class="section-heading">
+        <text class="section-title">当天游玩反馈</text>
+        <text class="section-caption">{{commentCount}} 条留言</text>
+      </view>
+      <text class="comments-description">{{day.date}} · 记下实际体验，也给同行的人一点参考。</text>
+      <view wx:if="{{communityError}}" class="comments-status">
+        <text>{{communityError}}</text>
+        <button class="comments-retry" bindtap="loadCommunity">重新加载</button>
+      </view>
+      <view wx:elif="{{communityLoading}}" class="comments-status">正在读取当天记录…</view>
+      <block wx:else>
+        <view wx:if="{{!comments.length}}" class="comments-status">还没有记录，写下今天的第一条反馈吧。</view>
+        <view wx:for="{{comments}}" wx:key="id" class="comment-item">
+          <view class="comment-avatar">
+            <image wx:if="{{item.avatarUrl}}" src="{{item.avatarUrl}}" mode="aspectFill" />
+            <text wx:else>{{item.initial}}</text>
+          </view>
+          <view class="comment-body">
+            <view class="comment-topline">
+              <text class="comment-author">{{item.nickName}}</text>
+              <button
+                wx:if="{{item.isMine}}"
+                class="comment-delete"
+                data-id="{{item.id}}"
+                bindtap="deleteComment"
+                disabled="{{!!deletingCommentId}}"
+                >{{deletingCommentId === item.id ? '删除中…' : '删除'}}</button
+              >
+            </view>
+            <text class="comment-time">{{item.timeLabel}}</text>
+            <text class="comment-content" user-select>{{item.content}}</text>
+          </view>
+        </view>
+        <button
+          wx:if="{{nextCommentCursor}}"
+          class="comments-load-more"
+          bindtap="loadMoreComments"
+          loading="{{loadingMoreComments}}"
+          disabled="{{loadingMoreComments}}"
+          >再看看之前的反馈</button
+        >
+      </block>
+      <view class="comment-composer">
+        <view class="composer-topline">
+          <text class="composer-title">写下今天的感受</text>
+          <button wx:if="{{communityLoaded}}" class="comment-profile" bindtap="editProfile"
+            >{{profile ? profile.nickName : '设置头像昵称'}} ↗</button
+          >
+        </view>
+        <textarea
+          class="comment-input"
+          value="{{commentDraft}}"
+          placeholder="路线顺不顺、排队多久、哪一站最喜欢……"
+          placeholder-class="comment-placeholder"
+          maxlength="500"
+          bindinput="onCommentInput"
+          disabled="{{!communityLoaded || communityLoading || !!communityError || postingComment}}"
+          show-confirm-bar="{{false}}"
+          adjust-position
+        />
+        <view class="composer-footer">
+          <text class="comment-counter">{{commentDraft.length}} / 500</text>
+          <button
+            class="comment-submit"
+            bindtap="submitComment"
+            loading="{{postingComment}}"
+            disabled="{{!communityLoaded || communityLoading || !!communityError || postingComment || !commentDraft.length}}"
+            >保存反馈</button
+          >
+        </view>
+      </view>
+    </view>
+    <view class="day-navigation"
+      ><button wx:if="{{previousDay}}" class="adjacent-day" data-id="{{previousDay.id}}" bindtap="changeDay"
+        ><text class="adjacent-label">← 前一天</text><text>{{previousDay.date}}</text></button
+      ><view wx:else></view
+      ><button wx:if="{{nextDay}}" class="adjacent-day adjacent-day--next" data-id="{{nextDay.id}}" bindtap="changeDay"
+        ><text class="adjacent-label">后一天 →</text><text>{{nextDay.date}}</text></button
+      ><view wx:else></view
+    ></view>
+    <text class="detail-footer">计划里的时间是参考，也给沿途的喜欢留一点余地。</text>
+  </view>
+  <view class="detail-action-bar"
+    ><button class="favorite-action {{isSaved ? 'favorite-action--saved' : ''}}" bindtap="toggleFavorite"
+      ><text class="favorite-icon">{{isSaved ? '♥' : '♡'}}</text><text>{{isSaved ? '已收藏' : '收藏'}}</text></button
+    ><button class="share-action" open-type="share">分享</button
+    ><button class="copy-action" bindtap="copyItinerary">复制当天行程</button></view
+  >
+  <view wx:if="{{profileVisible}}" class="profile-overlay" catchtouchmove="preventEvent">
+    <view class="profile-mask" bindtap="closeProfile"></view>
+    <view class="profile-sheet">
+      <view class="profile-heading">
+        <text class="section-title">让同行的人认识你</text>
+        <button class="profile-close" bindtap="closeProfile" disabled="{{profileSaving}}" aria-label="关闭头像昵称填写"
+          >×</button
+        >
+      </view>
+      <text class="profile-description">选择头像并填写昵称，将展示给查看行程和反馈的旅伴。</text>
+      <form bindsubmit="submitProfile">
+        <button
+          class="profile-avatar-picker"
+          open-type="chooseAvatar"
+          bindchooseavatar="onChooseAvatar"
+          disabled="{{profileSaving}}"
+          aria-label="选择微信头像"
+        >
+          <image
+            wx:if="{{profileAvatarPreview}}"
+            class="profile-avatar-image"
+            src="{{profileAvatarPreview}}"
+            mode="aspectFill"
+          />
+          <text wx:else class="profile-avatar-placeholder">＋</text>
+        </button>
+        <text class="profile-avatar-label">点击选择头像</text>
+        <input
+          class="profile-nickname"
+          name="nickName"
+          type="nickname"
+          value="{{profileNickName}}"
+          placeholder="填写昵称，可使用微信昵称"
+          maxlength="24"
+          disabled="{{profileSaving}}"
+          aria-label="报名和评论使用的昵称"
+        />
+        <button class="profile-confirm" form-type="submit" loading="{{profileSaving}}" disabled="{{profileSaving}}"
+          >{{profileAction === 'join' ? '确认并报名' : profileAction === 'comment' ? '确认并保存' :
+          '保存头像昵称'}}</button
+        >
+      </form>
+    </view>
+  </view>
+</block>
+<view wx:else class="empty-state"
+  ><text class="empty-symbol">⌕</text><text class="empty-title">这趟旅行暂时找不到</text
+  ><text class="empty-description">回到首页，挑一个喜欢的日子。</text
+  ><button class="quiet-button" bindtap="goHome">回到行程首页</button></view
+>

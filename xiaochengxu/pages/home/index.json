@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "阿帆的旅行账本",
+  "usingComponents": {
+    "travel-card": "/components/travel-card/index"
+  }
+}

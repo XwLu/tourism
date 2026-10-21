@@ -1,0 +1,3 @@
+[build]
+  base = "."
+  publish = "plans/dalian-20261001/web"
