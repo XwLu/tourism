@@ -34,7 +34,7 @@ await entry.link((specifier, parent) => {
   return loadModule(filename);
 });
 await entry.evaluate({ timeout: 1000 });
-const trips = normalizeTrips(entry.namespace.trips);
+export const trips = normalizeTrips(structuredClone(entry.namespace.trips));
 if (!trips.length) throw new Error('行程列表不能为空；下架旅行请在数据库中设置 published = 0');
 
 const rows = [];

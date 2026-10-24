@@ -11,6 +11,8 @@
 
 ## 行程内容发布与数据库登记
 
+- 自动发布入口为 `cloudrun/scripts/publish-trips.mjs`；若 `$HOME/.config/tourism/publish.env` 已配置，生成 SQL 后主动在 `cloudrun/` 执行 `node --env-file="$HOME/.config/tourism/publish.env" --experimental-vm-modules scripts/publish-trips.mjs`，检查云端回执。该脚本生成 SQL 备份，通过受保护接口事务更新同源行程，并验证正文、日期和野攀标记。不得输出私有文件或令牌；配置方式见 `cloudrun/README.md`。未配置或请求失败时不能宣称发布成功。
+
 - 每次新增、修改旅行内容或日期，更新 `xiaochengxu/data/` 和 `data/trips.js` 后，必须主动在 `cloudrun/` 目录执行 `npm run trip-sql`，生成最新的 `cloudrun/trip-registry.sql`，无需等待用户再次提醒。若本机没有可用的 npm，可使用 Node.js 22+ 在同一目录执行 `node --experimental-vm-modules scripts/generate-trip-sql.mjs` 等价生成。
 - SQL 同时更新 `travel_trips` 中的完整行程正文及 `travel_trip_days` 中的互动登记，二者在同一事务提交。检查全部旅行、日期、野攀标记与源数据一致；生成失败时先处理错误，不能跳过发布步骤。
 - 已有可用的云端数据库连接或控制台操作通道时，自动在项目配置的 MySQL 目标库执行生成的 SQL，并查询 `travel_trips` 和 `travel_trip_days` 验证正文及日期记录。发布不删除已有登记、报名或评论，不将数据库密码写入仓库。

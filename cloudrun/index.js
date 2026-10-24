@@ -3,13 +3,38 @@ const { createDatabase } = require('./db');
 const { createCommunity } = require('./community');
 const { InputError, getIdentity } = require('./weixin');
 const { normalizeTrips } = require('./trip-content');
+const { createHash, timingSafeEqual } = require('node:crypto');
 
-function createApp(database, moderation) {
+function createApp(database, moderation, env = process.env) {
   const app = express();
   const dispatch = createCommunity(database, moderation);
   app.disable('x-powered-by');
   app.get('/health', (request, response) => response.json({ ok: true }));
   app.get('/', (request, response) => response.json({ service: '阿帆的旅行账本', version: '1.0.0' }));
+  app.post('/api/admin/trips', (request, response, next) => {
+    response.set('Cache-Control', 'no-store');
+    const token = env.TRIP_PUBLISH_TOKEN;
+    if (!token || token.length < 32) return response.status(503).json({ ok: false, message: '行程发布未配置' });
+    const supplied = request.headers.authorization || '';
+    const digest = (value) => createHash('sha256').update(value).digest();
+    if (!timingSafeEqual(digest(supplied), digest(`Bearer ${token}`))) {
+      return response.status(401).json({ ok: false, message: '发布凭据无效' });
+    }
+    next();
+  }, express.json({ limit: '2mb' }), async (request, response) => {
+    let trips;
+    try {
+      trips = normalizeTrips(request.body?.trips);
+      if (!trips.length) throw new Error('行程列表不能为空');
+    } catch (error) {
+      throw new InputError(error.message);
+    }
+    response.json({ ok: true, data: await database.publishTrips(trips) });
+  });
+  app.use((request, response, next) => {
+    if (env.TRIP_PUBLISH_ONLY === 'true') return response.status(404).json({ ok: false, message: '接口暂时不存在' });
+    next();
+  });
   const requireWechat = (request, response, next) => {
     try {
       request.wechatIdentity = getIdentity(request.headers);
@@ -31,11 +56,11 @@ function createApp(database, moderation) {
   app.use((error, request, response, next) => {
     if (error instanceof InputError) return response.status(error.status).json({ ok: false, message: error.message });
     if (error.type === 'entity.too.large')
-      return response.status(413).json({ ok: false, message: '头像过大，请重新选择' });
+      return response.status(413).json({ ok: false, message: '请求内容过大，请缩小后重试' });
     if (error.type === 'entity.parse.failed')
       return response.status(400).json({ ok: false, message: '请求内容无法读取' });
     console.error('Travel request failed:', error.code || error.name);
-    const message = request.path === '/api/trips' ? '行程暂时无法更新，请稍后重试' : '同行记录暂时不可用，请稍后重试';
+    const message = request.path.startsWith('/api/admin/') ? '行程发布失败，请重新发布并验证' : request.path === '/api/trips' ? '行程暂时无法更新，请稍后重试' : '同行记录暂时不可用，请稍后重试';
     return response.status(503).json({ ok: false, message });
   });
   return app;

@@ -1,6 +1,7 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const mysql = require('mysql2/promise');
+const { isDeepStrictEqual } = require('node:util');
 
 function createDatabase(env = process.env) {
   const required = ['MYSQL_ADDRESS', 'MYSQL_USERNAME', 'MYSQL_PASSWORD'];
@@ -37,6 +38,39 @@ function createDatabase(env = process.env) {
       }
     },
     close: () => pool.end(),
+    async publishTrips(trips) {
+      const connection = await pool.getConnection();
+      try {
+        await connection.beginTransaction();
+        const verified = [];
+        for (const [sortOrder, trip] of trips.entries()) {
+          await connection.execute(
+            `INSERT INTO travel_trips (trip_id, content, sort_order, published) VALUES (?, ?, ?, 1)
+             ON DUPLICATE KEY UPDATE content = VALUES(content), sort_order = VALUES(sort_order), published = 1`,
+            [trip.id, JSON.stringify(trip), sortOrder],
+          );
+          for (const day of trip.days) {
+            await connection.execute(
+              'INSERT INTO travel_trip_days (trip_id, day_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE day_id = VALUES(day_id)',
+              [trip.id, day.id],
+            );
+          }
+          const [rows] = await connection.execute('SELECT content, published FROM travel_trips WHERE trip_id = ?', [trip.id]);
+          const stored = typeof rows[0]?.content === 'string' ? JSON.parse(rows[0].content) : rows[0]?.content;
+          if (Number(rows[0]?.published) !== 1 || !isDeepStrictEqual(stored, trip)) throw new Error('行程正文验证失败');
+          const [days] = await connection.execute('SELECT day_id FROM travel_trip_days WHERE trip_id = ?', [trip.id]);
+          if (trip.days.some((day) => !days.some((row) => row.day_id === day.id))) throw new Error('日期登记验证失败');
+          verified.push({ id: trip.id, title: stored.title, published: 1, days: stored.days.map((day) => ({ id: day.id, date: day.date, hasOutdoorClimbing: day.hasOutdoorClimbing })) });
+        }
+        await connection.commit();
+        return { trips: verified };
+      } catch (error) {
+        await connection.rollback();
+        throw error;
+      } finally {
+        connection.release();
+      }
+    },
     async listTrips() {
       const rows = await query(
         'SELECT trip_id AS id, content FROM travel_trips WHERE published = 1 ORDER BY sort_order, trip_id',

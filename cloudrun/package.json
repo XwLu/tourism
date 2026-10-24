@@ -9,7 +9,8 @@
   },
   "scripts": {
     "start": "node index.js",
-    "trip-sql": "node --experimental-vm-modules scripts/generate-trip-sql.mjs"
+    "trip-sql": "node --experimental-vm-modules scripts/generate-trip-sql.mjs",
+    "trip-publish": "node --experimental-vm-modules scripts/publish-trips.mjs"
   },
   "dependencies": {
     "express": "^5.1.0",

@@ -13,6 +13,34 @@
 
 ## 1. 填写数据库环境变量
 
+自动发布的首次配置见下方「自动发布行程」。
+
+### 自动发布行程
+
+本地 `npm run trip-publish` 会先生成 SQL 备份，再将完整行程 JSON 发往 `POST /api/admin/trips`。服务校验数据，以参数化语句在同一事务更新正文和日期，回读校验完整正文、上架状态和日期登记后提交。本地检查云端回执中的 ID、标题、日期与野攀标记。不会执行上传的 SQL，不删除历史日期、报名、评论或未包含的旅行；包含的旅行会恢复上架。
+
+首次配置（需要在控制台操作一次）：
+
+1. 小程序后台首页 → 开发与服务 → 云服务 → 云托管（去使用）→ 前往控制台，选择环境 `prod-d7gikpjuqf33d2a1c`。
+2. 保持原服务 `express-1zah` 的公网访问关闭。在同一环境新建专用发布服务，上传同一份后端代码包，按本文第 3 节配置端口与 Dockerfile。专用服务复用同一 MySQL 内网连接和 `MYSQL_DATABASE=nodejs_demo`，设置 `TRIP_PUBLISH_ONLY=true`，仅该服务开启 HTTPS 公网访问。此模式禁止访问行程读取和社区接口，避免改变原小程序的访问边界。专用服务会产生相应云托管资源费用。
+3. 本机运行下面的命令生成私有配置文件（首次执行，勿覆盖已有文件），将文件中的令牌复制到专用服务的环境变量 `TRIP_PUBLISH_TOKEN`。令牌至少 32 字符，仅保存在控制台和仓库外文件；不要放进小程序、Git 或聊天。构建发布后，把服务的实际 HTTPS 地址填入本机文件的 `TRIP_PUBLISH_URL`。
+
+```sh
+mkdir -p "$HOME/.config/tourism"
+(umask 077; node -e 'const fs = require("node:fs"); const crypto = require("node:crypto"); fs.writeFileSync(process.env.HOME + "/.config/tourism/publish.env", "TRIP_PUBLISH_URL=https://replace-with-service-host\nTRIP_PUBLISH_TOKEN=" + crypto.randomBytes(32).toString("hex") + "\n", { flag: "wx", mode: 0o600 });')
+```
+
+后续发布只需运行：
+
+```sh
+cd /Users/looyifan/Workspace/tourism/cloudrun
+node --env-file="$HOME/.config/tourism/publish.env" --experimental-vm-modules scripts/publish-trips.mjs
+```
+
+也可在已配置上述两个环境变量的终端运行 `npm run trip-publish`。本机需要 Node.js 22+。配置完成后，Codex 可读取该私有文件执行发布，无需再手动进入 SQL 窗口。不要输出文件中的令牌。超时或回执异常不代表数据库一定未提交，可重复发布并验证；未配置令牌时接口关闭，错误令牌返回 401。令牌轮换时同步更新控制台和本机文件。
+
+首次部署由控制台完成；仓库代码和本地 SQL 生成成功均不代表云端已上线。此功能无需修改或重新发布小程序。发布成功后重新进入小程序或下拉刷新，核对正文和野攀日保险提示。仍可按下文的 SQL 流程作为备用。
+
 进入微信云托管控制台，选择上述环境，打开「服务管理 → express-1zah → 服务设置 → 基本信息」，在「环境变量」中添加或修改以下项目。首次部署也可以在发布页面填写环境变量。模板部署可能已自动注入前三项；有正确值时直接沿用，不必重复添加。
 
 | 变量名 | 填写内容 |
