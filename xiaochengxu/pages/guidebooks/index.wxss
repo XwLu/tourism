@@ -1,0 +1,16 @@
+.guide-header { padding: 20rpx 8rpx 38rpx; }
+.guide-heading { display: block; margin-top: 28rpx; font-size: 45rpx; font-weight: 650; }
+.guide-intro { display: block; margin-top: 18rpx; color: #929488; font-size: 25rpx; line-height: 1.7; }
+.search-box { display: flex; height: 82rpx; align-items: center; padding: 0 24rpx; border-radius: 18rpx; background: #efeee9; }
+.search-icon { position: relative; width: 25rpx; height: 25rpx; flex-shrink: 0; margin: 0 23rpx 4rpx 0; border: 2rpx solid #8d9488; border-radius: 50%; }
+.search-icon::after { position: absolute; right: -8rpx; bottom: -5rpx; width: 12rpx; height: 2rpx; transform: rotate(45deg); background: #8d9488; content: ''; }
+.search-input { flex: 1; min-width: 0; height: 70rpx; font-size: 25rpx; }
+.clear-search { padding: 12rpx; color: #96988d; font-size: 36rpx; }
+.guide-card { display: flex; width: 100%; align-items: center; margin-bottom: 18rpx; padding: 28rpx; border: 1rpx solid #eeede6; border-radius: 22rpx; background: #fffefa; text-align: left; }
+.guide-card-mark { display: flex; width: 90rpx; height: 104rpx; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 14rpx; background: #e6ede4; color: #68816c; font-size: 42rpx; }
+.guide-card-content { display: flex; min-width: 0; flex: 1; flex-direction: column; padding: 0 22rpx; }
+.guide-card-location { color: #a18d79; font-size: 20rpx; }
+.guide-card-title { margin-top: 8rpx; font-size: 31rpx; font-weight: 650; }
+.guide-card-description { margin-top: 8rpx; color: #858c80; font-size: 22rpx; line-height: 1.5; }
+.guide-card-pages { margin-top: 10rpx; color: #a7aa9e; font-size: 20rpx; }
+.guide-arrow { color: #a4aa9e; font-size: 42rpx; }

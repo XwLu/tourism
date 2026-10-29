@@ -1,8 +1,10 @@
 .DS_Store
 .codex/
 /cloudrun-deploy.zip
+/cloudrun-guidebook-deploy.zip
 /trip-publisher-deploy.zip
 /cloudrun/node_modules/
+/cloudrun/generated-guidebooks/
 .env
 .env.*
 !.env.example

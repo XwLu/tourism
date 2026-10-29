@@ -21,6 +21,7 @@ Page({
     resultCount: 0,
   },
   onShow() {
+    if (typeof this.getTabBar === 'function') this.getTabBar()?.setData({ selected: 'pages/home/index' });
     this.updateCards();
     this.loadTrips();
   },

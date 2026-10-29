@@ -11,6 +11,7 @@
     <view wx:if="{{item.icon === 'discover'}}" class="discover-icon"
       ><view></view><view></view><view></view><view></view
     ></view>
+    <view wx:elif="{{item.icon === 'guide'}}" class="guide-icon"><view></view></view>
     <text wx:else class="saved-icon">♡</text>
     <text class="tab-label">{{item.label}}</text><view class="active-dot"></view>
   </view>

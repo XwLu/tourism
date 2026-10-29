@@ -1,0 +1,26 @@
+.detail-shell { padding: 30rpx 28rpx 70rpx; }
+.detail-header { padding: 8rpx 8rpx 28rpx; }
+.detail-title { display: block; margin-top: 20rpx; font-size: 44rpx; font-weight: 650; }
+.detail-location { display: block; margin-top: 12rpx; color: #9a8170; font-size: 23rpx; }
+.detail-description { display: block; margin-top: 16rpx; color: #858c80; font-size: 24rpx; line-height: 1.7; }
+.section-scroll { width: 100%; white-space: nowrap; }
+.section-tabs { display: flex; padding: 6rpx 0 14rpx; }
+.section-tab { display: flex; min-width: 156rpx; flex-shrink: 0; flex-direction: column; align-items: center; margin-right: 14rpx; padding: 18rpx 22rpx; border: 1rpx solid #eeede6; border-radius: 16rpx; background: #fffefa; color: #858b7e; font-size: 25rpx; }
+.section-tab--active { border-color: #3f5d4e; background: #3f5d4e; color: #fffdf4; }
+.section-tab-count { margin-top: 6rpx; font-size: 20rpx; opacity: .75; }
+.section-intro { margin: 14rpx 0 24rpx; padding: 28rpx; border: 1rpx solid #eeede6; border-radius: 18rpx; background: #fffefa; }
+.section-intro-title { display: block; color: #304a3d; font-size: 31rpx; font-weight: 650; }
+.intro-block { margin-top: 22rpx; }
+.intro-label { display: block; color: #9a8170; font-size: 22rpx; font-weight: 600; }
+.intro-text { display: block; margin-top: 8rpx; color: #56635a; font-size: 25rpx; line-height: 1.8; }
+.intro-routes { display: block; margin-top: 24rpx; padding-top: 20rpx; border-top: 1rpx solid #efeee7; color: #496454; font-size: 23rpx; }
+.page-controls { display: flex; align-items: center; justify-content: space-between; margin: 20rpx 0; }
+.page-button { min-width: 140rpx; padding: 14rpx 22rpx; border-radius: 30rpx; background: #e9efe7; color: #496454; font-size: 24rpx; }
+.page-button[disabled] { background: #eeeee9; color: #b8b9b1; }
+.page-count { color: #858c80; font-size: 24rpx; }
+.page-status { padding: 100rpx 24rpx; color: #858c80; font-size: 25rpx; line-height: 1.8; text-align: center; }
+.page-status text { display: block; }
+.page-image-wrap { overflow: hidden; border: 1rpx solid #eeede6; border-radius: 14rpx; background: #fff; }
+.page-image { display: block; width: 100%; }
+.page-hint { display: block; padding: 14rpx; color: #9a9d93; font-size: 21rpx; text-align: center; }
+.bottom-controls { margin-top: 28rpx; }

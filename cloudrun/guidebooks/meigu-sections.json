@@ -1,0 +1,5 @@
+[
+  { "id": "intro", "title": "岩场介绍", "startPage": 1, "endPage": 3 },
+  { "id": "west", "title": "西侧岩壁", "startPage": 4, "endPage": 9 },
+  { "id": "east", "title": "东侧岩壁", "startPage": 10, "endPage": 20 }
+]

@@ -4,6 +4,7 @@ import { refreshTrips } from '../../utils/trip-store';
 Page({
   data: { leftColumn: [], rightColumn: [], resultCount: 0, tripsLoading: false, tripError: '' },
   onShow() {
+    if (typeof this.getTabBar === 'function') this.getTabBar()?.setData({ selected: 'pages/saved/index' });
     this.updateCards();
     this.loadTrips();
   },

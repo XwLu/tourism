@@ -17,6 +17,8 @@
 python3 xiaochengxu/scripts/generate-covers.py --only linan-shiziyan dongyang-meigu xinchang-baizhangyan quzhou-liangtoudong
 ```
 
+石狗洞和天地岩封面参考用户提供的岩场照片，以同一 Pillow 插画风格绘制，分别为 `xinchang-shigoudong.jpg` 和 `xinchang-tiandiyan.jpg`；同源副本位于 `xiaochengxu/static/travel/`，供路书卡片和未来行程封面复用。新增包内图片需发布小程序；如后续用于仅通过 SQL 新增的旅行，须先上传云存储并使用可访问的 HTTPS 地址。
+
 `--only` 可以指定一张或多张；`--output` 可覆盖输出目录。不带 `--only` 时，原有大连封面和地图标记生成到 `xiaochengxu/static/travel/`，上述四张云端封面生成到本目录。
 
 重新生成图片后，将需要更新的 `.jpg` 文件上传至微信云托管的「对象存储 → 存储管理 → travel_pic」。需要替换已有云端图片时，建议使用新文件名，以免命中旧图缓存。验证不带临时签名的 HTTPS 地址可以公开访问后，同步更新本清单及对应旅行和当天的 `cover`，再生成并执行行程 SQL。

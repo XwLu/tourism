@@ -1,0 +1,21 @@
+<view class="page-shell">
+  <view class="guide-header">
+    <text class="eyebrow">CLIMBING GUIDEBOOKS</text>
+    <text class="guide-heading">去岩壁，找一条线。</text>
+    <text class="guide-intro">把岩场的入口、线路和故事，装进口袋。</text>
+  </view>
+  <view class="search-box">
+    <view class="search-icon"></view>
+    <input class="search-input" value="{{keyword}}" placeholder="搜索岩场或地点" bindinput="onSearch" confirm-type="search" maxlength="60" aria-label="搜索岩场" />
+    <button wx:if="{{keyword}}" class="clear-search" bindtap="clearSearch" aria-label="清空搜索">×</button>
+  </view>
+  <view class="section-heading"><text class="section-title">岩场路书</text><text class="section-caption">{{results.length}} 个岩场</text></view>
+  <view wx:if="{{loading || error}}" class="trip-status"><text>{{loading ? '正在加载路书…' : error}}</text><button wx:if="{{error}}" class="trip-retry" bindtap="loadGuides">重新加载</button></view>
+  <button wx:for="{{results}}" wx:key="id" class="guide-card" data-id="{{item.id}}" bindtap="openGuide">
+    <image wx:if="{{item.cover}}" class="guide-card-mark" src="{{item.cover}}" mode="aspectFill" data-id="{{item.id}}" binderror="onCoverError" />
+    <view wx:else class="guide-card-mark">山</view>
+    <view class="guide-card-content"><text class="guide-card-location">{{item.location}}</text><text class="guide-card-title">{{item.title}}</text><text class="guide-card-description">{{item.description}}</text><text class="guide-card-pages">{{item.sections.length}} 个区域</text></view>
+    <text class="guide-arrow">›</text>
+  </button>
+  <view wx:if="{{!loading && !error && !results.length}}" class="empty-state"><text class="empty-symbol">⌕</text><text class="empty-title">{{keyword ? '没有找到这个岩场' : '暂时还没有路书'}}</text><text class="empty-description">{{keyword ? '换个岩场名或地点，再找找看。' : '新的岩场路书正在路上。'}}</text><button wx:if="{{keyword}}" class="quiet-button" bindtap="clearSearch">查看全部岩场</button></view>
+</view>

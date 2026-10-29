@@ -1,10 +1,10 @@
 {
-  "pages": ["pages/home/index", "pages/saved/index", "pages/itinerary/index"],
+  "pages": ["pages/home/index", "pages/guidebooks/index", "pages/saved/index", "pages/itinerary/index", "pages/guidebook-detail/index"],
   "window": {
     "backgroundColor": "#f8f7f4",
     "backgroundTextStyle": "dark",
     "navigationBarBackgroundColor": "#f8f7f4",
-    "navigationBarTitleText": "阿帆的旅行账本",
+    "navigationBarTitleText": "旅行日记",
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
@@ -14,6 +14,7 @@
     "backgroundColor": "#ffffff",
     "list": [
       { "pagePath": "pages/home/index", "text": "发现行程" },
+      { "pagePath": "pages/guidebooks/index", "text": "岩场路书" },
       { "pagePath": "pages/saved/index", "text": "我的收藏" }
     ]
   },

@@ -38,6 +38,69 @@ function createDatabase(env = process.env) {
       }
     },
     close: () => pool.end(),
+    async publishGuidebook(guide) {
+      const connection = await pool.getConnection();
+      try {
+        await connection.beginTransaction();
+        await connection.execute(
+          `INSERT INTO climbing_guidebooks (guide_id, title, location, description, version, page_count, published)
+           VALUES (?, ?, ?, ?, ?, ?, 1) ON DUPLICATE KEY UPDATE title = VALUES(title), location = VALUES(location),
+           description = VALUES(description), version = VALUES(version), page_count = VALUES(page_count), published = 1`,
+          [guide.id, guide.title, guide.location, guide.description, guide.version, guide.pages.length],
+        );
+        await connection.execute('DELETE FROM climbing_guidebook_pages WHERE guide_id = ?', [guide.id]);
+        await connection.execute('DELETE FROM climbing_guidebook_section_intros WHERE guide_id = ?', [guide.id]);
+        await connection.execute('DELETE FROM climbing_guidebook_sections WHERE guide_id = ?', [guide.id]);
+        for (const [index, page] of guide.pages.entries()) {
+          await connection.execute('INSERT INTO climbing_guidebook_pages (guide_id, page_number, image) VALUES (?, ?, ?)', [guide.id, index + 1, page]);
+        }
+        for (const [index, section] of guide.sections.entries()) {
+          await connection.execute('INSERT INTO climbing_guidebook_sections (guide_id, section_order, section_id, title, start_page, end_page) VALUES (?, ?, ?, ?, ?, ?)', [guide.id, index, section.id, section.title, section.startPage, section.endPage]);
+          if (section.intro) await connection.execute('INSERT INTO climbing_guidebook_section_intros (guide_id, section_id, intro) VALUES (?, ?, ?)', [guide.id, section.id, JSON.stringify(section.intro)]);
+        }
+        const [rows] = await connection.execute('SELECT page_number, image FROM climbing_guidebook_pages WHERE guide_id = ? ORDER BY page_number', [guide.id]);
+        if (rows.length !== guide.pages.length || rows.some((row, index) => row.page_number !== index + 1 || !row.image.equals(guide.pages[index]))) throw new Error('路书图片验证失败');
+        const [metadata] = await connection.execute('SELECT title, location, description, version, page_count, published FROM climbing_guidebooks WHERE guide_id = ?', [guide.id]);
+        const stored = metadata[0];
+        if (!stored || stored.title !== guide.title || stored.location !== guide.location || stored.description !== guide.description || stored.version !== guide.version || Number(stored.page_count) !== guide.pages.length || Number(stored.published) !== 1) throw new Error('路书信息验证失败');
+        const [sectionRows] = await connection.execute('SELECT section.section_id AS id, section.title, section.start_page AS startPage, section.end_page AS endPage, intro.intro FROM climbing_guidebook_sections section LEFT JOIN climbing_guidebook_section_intros intro ON intro.guide_id = section.guide_id AND intro.section_id = section.section_id WHERE section.guide_id = ? ORDER BY section.section_order', [guide.id]);
+        const sections = sectionRows.map(({ intro, ...section }) => intro ? { ...section, intro: typeof intro === 'string' ? JSON.parse(intro) : intro } : section);
+        if (!isDeepStrictEqual(sections, guide.sections)) throw new Error('路书区域验证失败');
+        await connection.commit();
+        return { id: guide.id, version: guide.version, pageCount: guide.pages.length };
+      } catch (error) {
+        await connection.rollback();
+        throw error;
+      } finally {
+        connection.release();
+      }
+    },
+    async listGuidebooks() {
+      const rows = await query(`SELECT guide.guide_id AS id, guide.title, guide.location, guide.description, guide.version,
+        guide.page_count AS pageCount, section.section_id AS sectionId, section.title AS sectionTitle,
+        section.start_page AS startPage, section.end_page AS endPage, intro.intro AS sectionIntro FROM climbing_guidebooks guide
+        LEFT JOIN climbing_guidebook_sections section ON section.guide_id = guide.guide_id
+        LEFT JOIN climbing_guidebook_section_intros intro ON intro.guide_id = section.guide_id AND intro.section_id = section.section_id
+        WHERE guide.published = 1 ORDER BY guide.updated_at DESC, guide.guide_id, section.section_order`);
+      const guides = new Map();
+      for (const row of rows) {
+        if (!guides.has(row.id)) guides.set(row.id, { id: row.id, title: row.title, location: row.location, description: row.description, version: row.version, pageCount: row.pageCount, sections: [] });
+        if (row.sectionId) {
+          const section = { id: row.sectionId, title: row.sectionTitle, startPage: row.startPage, endPage: row.endPage };
+          if (row.sectionIntro) section.intro = typeof row.sectionIntro === 'string' ? JSON.parse(row.sectionIntro) : row.sectionIntro;
+          guides.get(row.id).sections.push(section);
+        }
+      }
+      return [...guides.values()];
+    },
+    async getGuidebookPage(id, pageNumber, version) {
+      const rows = await query(
+        `SELECT page.image FROM climbing_guidebook_pages page JOIN climbing_guidebooks guide ON guide.guide_id = page.guide_id
+         WHERE guide.guide_id = ? AND guide.published = 1 AND guide.version = ? AND page.page_number = ?`,
+        [id, version, pageNumber],
+      );
+      return rows[0]?.image || null;
+    },
     async publishTrips(trips) {
       const connection = await pool.getConnection();
       try {
