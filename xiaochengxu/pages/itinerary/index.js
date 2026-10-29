@@ -2,6 +2,7 @@ import { getTrip, getDay, getDayText, getSavedIds, getStops, toggleSaved } from 
 import { getMapData } from '../../utils/coordinates';
 import { formatCommentTime, requestCommunity, saveCommunityProfile } from '../../utils/community';
 import { refreshTrips } from '../../utils/trip-store';
+import { labelRecord } from '../../utils/climbing';
 
 function displayComments(comments) {
   return comments.map((comment) => ({
@@ -44,6 +45,7 @@ Page({
     profileNickName: '',
     profileSaving: false,
     profileAction: '',
+    climbingRecords: [],
   },
   onLoad(options) {
     this.tripId = options.id;
@@ -95,6 +97,7 @@ Page({
       commentDraft: this.commentDrafts[day.id] || '',
       communityLoaded: false,
       communityError: '',
+      climbingRecords: [],
       ...getMapData(day),
     });
     this.loadCommunity();
@@ -104,6 +107,27 @@ Page({
       this.setData({ isSaved: getSavedIds().includes(this.data.trip.id) });
     }
     this.loadTrip();
+  },
+  async loadClimbingRecords() {
+    const { trip, day } = this.data;
+    if (!trip || !day) return;
+    try {
+      const result = await requestCommunity('climbingRecords');
+      if (!this.disposed && this.data.day?.id === day.id) this.setData({ climbingRecords: result.records.filter((record) => record.tripId === trip.id && record.dayId === day.id).map(labelRecord) });
+    } catch (error) { if (!this.disposed) wx.showToast({ title: error.message, icon: 'none' }); }
+  },
+  openClimbingRecord() {
+    if (!this.canUseCommunity()) return;
+    if (!this.data.profile) { this.openProfile('climb'); return; }
+    wx.navigateTo({ url: `/pages/climbing-record/index?tripId=${this.data.trip.id}&dayId=${this.data.day.id}` });
+  },
+  deleteClimbingRecord(event) {
+    const id = event.currentTarget.dataset.id;
+    wx.showModal({ title: '删除磕线记录？', content: '删除后会重新计算个人统计。', success: async (result) => {
+      if (!result.confirm) return;
+      try { await requestCommunity('deleteClimbingRecord', { id }); await this.loadClimbingRecords(); }
+      catch (error) { wx.showToast({ title: error.message, icon: 'none' }); }
+    } });
   },
   onUnload() {
     this.disposed = true;
@@ -127,6 +151,7 @@ Page({
         nextCommentCursor: result.nextCursor,
         communityLoaded: true,
       });
+      this.loadClimbingRecords();
     } catch (error) {
       if (sequence === this.communitySequence && !this.disposed) this.setData({ communityError: error.message });
     } finally {
@@ -225,6 +250,7 @@ Page({
       this.setData({ profile: result.profile, profileVisible: false });
       if (profileAction === 'join') await this.joinTrip();
       else if (profileAction === 'comment') await this.postComment();
+      else if (profileAction === 'climb') this.openClimbingRecord();
       else await this.loadCommunity();
     } catch (error) {
       if (!this.disposed) wx.showToast({ title: error.message, icon: 'none' });

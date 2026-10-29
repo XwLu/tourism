@@ -707,3 +707,7 @@ button.enrollment-button.enrollment-button--joined[type='primary'][disabled] {
   font-weight: 500;
   text-align: center;
 }
+.climbing-entry { margin: 32rpx 0; padding: 0 0 24rpx; }
+.climbing-record-row { display: flex; justify-content: space-between; gap: 20rpx; padding: 18rpx 0; font-size: 24rpx; color: #53665a; }
+.climbing-record-row button { flex-shrink: 0; color: #bd6e61; }
+.climbing-add { margin-top: 20rpx; padding: 20rpx; border-radius: 16rpx; background: #e9efe7; color: #496454; text-align: center; }

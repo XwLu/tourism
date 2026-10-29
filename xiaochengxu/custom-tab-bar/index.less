@@ -61,6 +61,9 @@ view {
   height: 100%;
   border-left: 2rpx solid currentColor;
 }
+.profile-icon { width: 35rpx; height: 35rpx; position: relative; }
+.profile-icon::before { content: ''; display: block; width: 14rpx; height: 14rpx; margin: 0 auto; border: 2rpx solid currentColor; border-radius: 50%; }
+.profile-icon view { width: 30rpx; height: 16rpx; margin: 3rpx auto 0; border: 2rpx solid currentColor; border-radius: 18rpx 18rpx 4rpx 4rpx; }
 .active-dot {
   position: absolute;
   top: -4rpx;

@@ -1,0 +1,34 @@
+<scroll-view class="review-scroll" scroll-y style="height: {{scrollHeight}}px" scroll-into-view="{{scrollTarget}}" bindtap="closeMenus">
+  <view class="review-page">
+    <text class="eyebrow">CLIMBING JOURNAL</text><text class="review-title">路线回顾</text>
+    <text class="review-description">选择记录过的岩场和路线，回看每一次攀爬。</text>
+    <view wx:if="{{loading || error}}" class="trip-status"><text>{{loading ? '正在读取记录…' : error}}</text><button wx:if="{{error}}" class="trip-retry" bindtap="load">重试</button></view>
+    <view wx:elif="{{!records.length}}" class="review-empty">暂时还没有攀爬记录哦～</view>
+    <block wx:else>
+      <view id="guide-select" class="select-block" catchtap="keepMenuOpen">
+        <text class="field-label">岩场</text>
+        <input class="select-input" value="{{guideSearch}}" placeholder="输入岩场" placeholder-class="field-placeholder" bindfocus="focusGuide" bindblur="closeMenuAfterBlur" bindinput="searchGuides" bindkeyboardheightchange="onKeyboardHeightChange" adjust-position="{{false}}" />
+        <view wx:if="{{activeMenu === 'guide'}}" class="choice-menu">
+          <scroll-view wx:if="{{guideMatches.length}}" scroll-y style="height: {{guideMatches.length > 3 ? 240 : guideMatches.length * 72}}rpx;"><button wx:for="{{guideMatches}}" wx:key="id" class="route-choice" data-index="{{index}}" bindtap="chooseGuide">{{item.title}}</button></scroll-view>
+          <text wx:else class="choice-empty">没有找到已记录的岩场</text>
+        </view>
+      </view>
+      <view id="route-select" class="select-block" catchtap="keepMenuOpen">
+        <text class="field-label">路线</text>
+        <input class="select-input" value="{{routeSearch}}" placeholder="输入路线" placeholder-class="field-placeholder" bindfocus="focusRoute" bindblur="closeMenuAfterBlur" bindinput="searchRoutes" bindkeyboardheightchange="onKeyboardHeightChange" adjust-position="{{false}}" disabled="{{guideIndex < 0}}" />
+        <view wx:if="{{activeMenu === 'route'}}" class="choice-menu">
+          <scroll-view wx:if="{{routeMatches.length}}" scroll-y style="height: {{routeMatches.length > 3 ? 240 : routeMatches.length * 72}}rpx;"><button wx:for="{{routeMatches}}" wx:key="id" class="route-choice" data-index="{{index}}" bindtap="chooseRoute">{{item.title}}</button></scroll-view>
+          <text wx:else class="choice-empty">没有找到已记录的线路</text>
+        </view>
+      </view>
+      <button class="query-button" bindtap="query">查询记录</button>
+      <view wx:if="{{routeStats}}" class="route-summary">
+        <text class="summary-heading">{{routeSearch}}</text>
+        <text>先锋 {{routeStats.lead}} 次 · 顶绳 {{routeStats.toprope}} 次</text><text>最佳成绩：{{routeStats.best}}</text>
+        <block wx:if="{{routeNotes.length}}"><text class="summary-heading summary-spacer">路线心得</text><view wx:for="{{routeNotes}}" wx:key="id" class="attempt"><text class="attempt-time">记录于 {{item.timeLabel}}</text><text class="attempt-note" user-select>{{item.note}}</text></view></block>
+        <text class="summary-heading summary-spacer">攀爬记录</text>
+        <view wx:for="{{routeRecords}}" wx:key="id" class="attempt"><text>{{item.grade}} · {{item.styleLabel}} · {{item.resultLabel}}</text><text class="attempt-time">记录于 {{item.timeLabel}}</text></view>
+      </view>
+    </block>
+  </view>
+</scroll-view>

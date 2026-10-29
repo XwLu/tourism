@@ -59,7 +59,7 @@ node --env-file="$HOME/.config/tourism/publish.env" --experimental-vm-modules sc
 CREATE DATABASE IF NOT EXISTS nodejs_demo CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-服务启动时自动创建 `travel_trips`、`travel_trip_days`、`travel_profiles`、`travel_members`、`travel_comments` 五张表，不修改计数器表，不清空已有报名和评论。`travel_trips` 保存整趟旅行及全部日期的 JSON 内容；服务重启只建表，不覆盖已发布的正文。首次启用时还需执行本目录生成的 `trip-registry.sql` 导入完整行程，目前包含大连六日、临安狮子岩一日两趟旅行；仅执行 `schema.sql` 不会导入正文。
+服务启动时按 `schema.sql` 创建所需的行程、社区、路书和攀爬记录表，不清空已有数据。`travel_trips` 保存整趟旅行及全部日期的 JSON 内容；服务重启只建表，不覆盖已发布的正文。首次启用时还需发布本目录生成的行程数据；仅执行 `schema.sql` 不会导入正文。
 
 ## 2. 配置微信云调用
 
@@ -70,7 +70,7 @@ CREATE DATABASE IF NOT EXISTS nodejs_demo CHARACTER SET utf8mb4 COLLATE utf8mb4_
 
 必须在开启后重新构建服务版本，才能生效。本服务通过容器内的 `http://api.weixin.qq.com` 调用这些接口，无需填写 AppSecret 或 access_token。检查失败时不会保存内容。
 
-本服务只供小程序使用，在「服务设置」中关闭**公网访问**，使用 `wx.cloud.callContainer` 访问。身份读取云托管网关注入的 `X-WX-SOURCE`、`X-WX-APPID`、`X-WX-OPENID`；请求体中的用户 ID 不参与身份判断。部署到普通服务器时不能直接沿用这种鉴权。
+小程序使用的 `express-1zah` 应关闭**公网访问**，通过 `wx.cloud.callContainer` 访问；专用发布服务按上文单独配置。身份读取云托管网关注入的 `X-WX-SOURCE`、`X-WX-APPID`、`X-WX-OPENID`；请求体中的用户 ID 不参与身份判断。部署到普通服务器时不能直接沿用这种鉴权。
 
 ## 3. 上传代码并发布
 
@@ -104,6 +104,23 @@ CREATE DATABASE IF NOT EXISTS nodejs_demo CHARACTER SET utf8mb4 COLLATE utf8mb4_
 
 首次启用须将本目录的新代码分别部署到 `express-1zah` 和已配置的专用发布服务，再上传并发布小程序。两个服务均连接同一数据库；服务启动时创建路书表。上传代码包时不要包含 `generated-guidebooks/`、`node_modules/` 或私有环境文件。
 
+### 磕线记录与个人主页
+
+活动详情中的磕线记录按用户、活动、日期、岩场及路线保存，不需要选择区域。每条记录代表一次尝试，心得可留空；个人主页统计不同活动数、顶绳与先锋次数，以及先锋视攀、闪攀或红点的去重路线数。路线去重依据岩场及 Unicode 规范化后忽略大小写的线路名；手动名称不同不会自动合并。删除记录后重新统计。`express-1zah` 和专用发布服务都需要部署新后端，小程序也需发布新版本。
+
+个人主页折线图从首条记录的保存日期起，每 7 天累计一次，红线为先锋、蓝线为顶绳、黑线为二者合计；日期标签及纵轴随数据范围调整。补录历史活动时记录会计入保存日期，不代表实际活动发生日期。
+
+线路目录存入 `climbing_routes`，与路书图片分开维护：发布路书不会自动提取或发布线路。活动页可搜索并单选，未找到时可手动输入；个人路线回顾只允许选择本人已有记录，包括手动输入的路线。更新路书后应检查线路目录是否需要同步更新。以路书为准人工核对名称、归属和难度，按 `guidebooks/meigu-routes.json` 格式整理，再运行：
+
+```sh
+cd /Users/looyifan/Workspace/tourism/cloudrun
+node --env-file="$HOME/.config/tourism/publish.env" scripts/publish-climbing-routes.mjs guidebooks/meigu-routes.json
+```
+
+JSON 包含岩场 `guideId` 和 `routes` 数组，每条线路填写 `name`、`grade`，可填写已有区域的 `sectionId`。发布前先发布对应路书；发布会事务替换该岩场的整个线路目录，不删除磕线记录。各目录文件为 `meigu-routes.json`、`shiziyan-lower40-routes.json`（包含狮子岩五个区域）、`tiandiyan-routes.json`、`shigoudong-routes.json` 和 `baizhangyan-routes.json`。为任何岩场增加线路时，先将已有线路与新线路合并，再一起发布，避免覆盖其他区域的目录。没有可辨识名称的线路不纳入目录；来源明确使用编号作为名称的线路保留编号。原资料中的其他难度格式不在用户指定的选项中时，保存原难度或空 `grade`，当前表单不能自动选择或填写不支持的难度。检查发布回执中的岩场 ID 和数量，再到磕线记录页面搜索抽查；失败时不能宣称已写入数据库。
+
+路线回顾直接展示该路线的原始心得及记录保存时间。此前的总结接口已移除，数据库中已有的总结表不会自动删除；如自行配置过 OpenClaw 定时任务，需在 OpenClaw 中停止。
+
 ### 新增和更新路书
 
 #### 内容和排版
@@ -135,6 +152,7 @@ CREATE DATABASE IF NOT EXISTS nodejs_demo CHARACTER SET utf8mb4 COLLATE utf8mb4_
 2. 已配置 `~/.config/tourism/publish.env` 且路书服务已部署时，主动运行 `scripts/publish-guidebook.mjs` 发布。脚本生成 SQL 备份，通过受保护接口以事务更新单本路书的正文、区域和图片，并回读核对；不要输出或提交令牌。超时不代表一定没有提交，可安全重试并检查回执。
 3. 若没有可用发布服务或请求失败，仍生成 SQL 备份，明确告知用户尚未写入云端，并提供文件路径与 MySQL 控制台执行方法。SQL 包含建表及单本路书的事务，应完整执行到 `COMMIT;`；不要将生成文件成功当作发布成功。
 4. 确认发布回执的 ID、版本和页数，并检查数据库中的栏目和文字介绍；在小程序重新进入路书页或下拉刷新，检查搜索、区域切换、文字首页、线路翻页与图片放大。首次上线或涉及小程序代码、包内资源、后端代码时，分别完成相应部署和发布；仅修改已支持的数据无需重新发布小程序或后端。
+5. 检查并按上方「磕线记录与个人主页」更新该岩场的线路目录；路书图片和可搜索线路是两份独立数据。
 
 用于数据库核验时，把以下 `meigu` 替换为本次路书 ID，并与源配置逐项比对：
 
@@ -156,15 +174,7 @@ node --env-file="$HOME/.config/tourism/publish.env" scripts/publish-guidebook.mj
 
 `--layout` 可按配置将 PDF 页面或片段依次拼为一页，格式见 `guidebooks/meigu-layout.json`；页码从 1 开始，`vertical` 使用上下边界的比例。梅谷的每面岩壁与对应线路表放在同一页。区域通过 `--sections` 指定 JSON 配置，格式见 `guidebooks/meigu-sections.json`：每项包含唯一的英文 `id`、显示名称 `title`、组合后的页码 `startPage` 和 `endPage`；区域按页码排列且不能重叠，可以留空不需要显示的页。不指定时显示全部页面。梅谷显示介绍、西侧、东侧，最后一页致谢不展示。修改区域或组合只需重新准备和发布数据。
 
-发布脚本先生成 `generated-guidebooks/meigu.sql` 备份，再通过受保护接口在一个事务中替换该岩场的所有页面和区域并回读验证；其他岩场不受影响。PDF 最多 100 页，单页 JPEG 不超过约 1 MB，整个发布请求不超过 16 MB。如果尚未部署专用发布服务，可在脚本最后添加 `--sql-only`，将生成的 SQL 完整导入 MySQL 的 `nodejs_demo` 库作为备用。生成 SQL 并不代表云端已更新。可运行以下查询确认页数和图片均已写入：
-
-```sql
-SELECT guide_id, title, page_count, published FROM climbing_guidebooks WHERE guide_id = 'meigu';
-SELECT COUNT(*) AS pages, SUM(OCTET_LENGTH(image)) AS image_bytes FROM climbing_guidebook_pages WHERE guide_id = 'meigu';
-SELECT section_id, title, start_page, end_page FROM climbing_guidebook_sections WHERE guide_id = 'meigu' ORDER BY section_order;
-```
-
-梅谷应为 21 页（包括不展示的致谢页），且图片字节数大于零。路书页以图片形式保存，来源为用户提供的 PDF；线路资料与现场状况可能不同，请参照原路书的行为准则。
+如果尚未部署专用发布服务，可在发布脚本后添加 `--sql-only`，将生成的 SQL 完整导入 MySQL 的 `nodejs_demo` 库作为备用。生成 SQL 并不代表云端已更新。梅谷应为 21 页（包括不展示的致谢页），且图片字节数大于零；按上面的查询核验。线路资料与现场状况可能不同，请参照原路书的行为准则。
 
 狮子岩路书使用多份 PDF 和 `guidebooks/shiziyan.json`，每份文件对应一个区域，配置中的 `rect` 是原 PDF 页面的左右上下裁剪比例。更新时保持原文件名，重新执行：
 
@@ -186,7 +196,7 @@ MySQL 和容器均使用已开通环境里的资源，实际费用按控制台�
 
 ## 首次启用联网行程
 
-1. 在本目录运行 `npm run trip-sql`，打开「MySQL → 数据库管理」，选中 `MYSQL_DATABASE` 对应的库，执行生成的 `trip-registry.sql`。文件会补建行程表并导入当前所有旅行正文和日期，目前为两趟旅行、七个日期；可以重复执行，不删除已有报名和评论。
+1. 在本目录运行 `npm run trip-sql`，打开「MySQL → 数据库管理」，选中 `MYSQL_DATABASE` 对应的库，执行生成的 `trip-registry.sql`。文件会补建行程表并导入当前所有旅行正文和日期；可以重复执行，不删除已有报名和评论。
 2. 按第 3 节上传新的 `cloudrun-deploy.zip` 并发布，沿用现有环境变量。新版本必须包含 `trip-content.js`；Dockerfile 已同步更新。
 3. 在开发者工具重新编译小程序，验证后上传体验版；正式版按微信流程审核、发布。这一步只需在首次切换联网行程时进行。
 4. 用另一个微信账号验证行程、报名和评论，再在数据库更新一处文字，下拉刷新确认内容变化。

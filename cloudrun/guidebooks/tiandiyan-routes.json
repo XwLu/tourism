@@ -1,0 +1,24 @@
+{
+  "guideId": "xinchang-tiandiyan",
+  "routes": [
+    { "name": "买一送一", "grade": "5.12b" },
+    { "name": "初恋", "grade": "5.11b" },
+    { "name": "羊肉汤", "grade": "5.11b" },
+    { "name": "冬冷夏凉", "grade": "5.13b" },
+    { "name": "三岔口", "grade": "5.12c" },
+    { "name": "耐克", "grade": "5.10b" },
+    { "name": "边界", "grade": "5.11d" },
+    { "name": "硬钢", "grade": "5.12d" },
+    { "name": "锋芒", "grade": "5.10a" },
+    { "name": "乌托邦", "grade": "5.12a" },
+    { "name": "麦辣鸡翅", "grade": "5.10d" },
+    { "name": "三言二语", "grade": "5.11d" },
+    { "name": "妙不可言", "grade": "5.11c" },
+    { "name": "包菜", "grade": "5.12b" },
+    { "name": "满月", "grade": "5.11b" },
+    { "name": "披星戴月", "grade": "5.11c" },
+    { "name": "呲溜呲溜", "grade": "5.10c" },
+    { "name": "老登骗我", "grade": "5.10b" },
+    { "sectionId": "right-wall", "name": "开门见凤", "grade": "5.12a" }
+  ]
+}

@@ -69,6 +69,41 @@ function createCommunity(database, moderation = { checkText, checkImage }) {
   return async (event, identity) => {
     const userId = hash(`${identity.appId}:${identity.openid}`);
     switch (event.action) {
+      case 'climbingRecords': {
+        const [profile, records] = await Promise.all([database.getProfile(userId), database.listClimbingRecords(userId)]);
+        return { profile, records };
+      }
+      case 'climbingRoutes': {
+        const guideId = text(event.guideId, 64, '请选择岩场');
+        const catalog = await database.listClimbingRoutes(guideId);
+        const records = await database.listClimbingRecords(userId);
+        const items = [...catalog, ...records.filter((record) => record.guideId === guideId).map((record) => ({ routeName: record.routeName, grade: record.grade }))];
+        const routes = [...new Map(items.map((item) => [item.routeName.normalize('NFKC').toLowerCase().replace(/\s+/g, ' ').trim(), item])).values()];
+        return { routes };
+      }
+      case 'addClimbingRecord': {
+        await validateTrip(event.tripId, event.dayId, true);
+        if (!(await database.getProfile(userId))) throw new InputError('请先选择头像并填写昵称');
+        const routeName = text(event.routeName, 120, '请填写线路名称');
+        const guideId = text(event.guideId, 64, '请选择岩场');
+        const guide = (await database.listGuidebooks()).find((item) => item.id === guideId);
+        if (!guide) throw new InputError('请选择有效的岩场');
+        const grades = ['5.7', '5.8', '5.9', ...[10, 11, 12, 13, 14].flatMap((level) => ['a', 'b', 'c', 'd'].map((suffix) => `5.${level}${suffix}`))];
+        if (!grades.includes(event.grade) || !['toprope', 'lead'].includes(event.style) || !['onsight', 'flash', 'redpoint', 'pinkpoint', 'complete', 'incomplete'].includes(event.result)) throw new InputError('请选择难度、攀爬方式和结果');
+        if (typeof event.requestId !== 'string' || !/^[a-f0-9]{32}$/.test(event.requestId)) throw new InputError('请重新提交磕线记录');
+        const note = event.note === undefined ? '' : typeof event.note === 'string' ? event.note.trim() : null;
+        if (note === null || note.length > 500) throw new InputError('心得不能超过 500 字');
+        await Promise.all([moderation.checkText(routeName, identity.openid, 2), note ? moderation.checkText(note, identity.openid, 2) : undefined]);
+        const id = hash(`${userId}:${event.tripId}:${event.dayId}:${event.requestId}`).slice(0, 32);
+        const routeKey = hash(JSON.stringify([guideId, routeName.normalize('NFKC').toLowerCase().replace(/\s+/g, ' ').trim()]));
+        await database.addClimbingRecord({ id, userId, tripId: event.tripId, dayId: event.dayId, guideId, guideTitle: guide.title, sectionId: '', sectionTitle: '', routeName, routeKey, grade: event.grade, style: event.style, result: event.result, note });
+        return { id };
+      }
+      case 'deleteClimbingRecord': {
+        if (typeof event.id !== 'string' || !/^[a-f0-9]{32}$/.test(event.id)) throw new InputError('记录不存在');
+        if (!(await database.deleteClimbingRecord(event.id, userId))) throw new InputError('只能删除自己的记录');
+        return { deleted: true };
+      }
       case 'getAvatar': {
         if (typeof event.avatarId !== 'string' || !/^[a-f0-9]{64}$/.test(event.avatarId))
           throw new InputError('头像暂时找不到');

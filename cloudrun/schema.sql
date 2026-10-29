@@ -88,3 +88,32 @@ CREATE TABLE IF NOT EXISTS travel_comments (
   INDEX comment_day_page (trip_id, day_id, created_at, id),
   FOREIGN KEY (user_id) REFERENCES travel_profiles(user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS climbing_records (
+  id CHAR(32) CHARACTER SET ascii COLLATE ascii_bin PRIMARY KEY,
+  user_id CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  trip_id VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  day_id VARCHAR(16) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  guide_id VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  guide_title VARCHAR(100) NOT NULL,
+  section_id VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  section_title VARCHAR(100) NOT NULL,
+  route_name VARCHAR(120) NOT NULL,
+  route_key CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  grade VARCHAR(8) CHARACTER SET ascii NOT NULL,
+  style VARCHAR(16) CHARACTER SET ascii NOT NULL,
+  result VARCHAR(16) CHARACTER SET ascii NOT NULL,
+  note TEXT NOT NULL,
+  created_at BIGINT UNSIGNED NOT NULL,
+  INDEX record_user_trip (user_id, trip_id, day_id),
+  INDEX record_user_route (user_id, route_key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS climbing_routes (
+  guide_id VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  section_id VARCHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  route_key CHAR(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  route_name VARCHAR(120) NOT NULL,
+  grade VARCHAR(8) CHARACTER SET ascii NOT NULL DEFAULT '',
+  PRIMARY KEY (guide_id, section_id, route_key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

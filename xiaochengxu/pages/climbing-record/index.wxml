@@ -1,0 +1,29 @@
+<view class="form-page" bindtap="closeMenus">
+  <text class="form-title">记下这一次攀爬</text><text class="form-description">每条记录代表一次尝试，带 * 的项目必填。</text>
+  <view wx:if="{{error}}" class="trip-status"><text>{{error}}</text><button bindtap="loadGuides">重试</button></view>
+  <block wx:else>
+    <text class="form-label">岩场 *</text>
+    <view catchtap="keepMenuOpen">
+      <input class="field" value="{{guideQuery}}" placeholder="输入岩场" placeholder-class="field-placeholder" bindfocus="focusGuide" bindblur="closeMenuAfterBlur" bindinput="inputGuide" disabled="{{loading}}" />
+      <view wx:if="{{activeMenu === 'guide'}}" class="choice-menu">
+        <scroll-view wx:if="{{guideMatches.length}}" scroll-y style="height: {{guideMatches.length > 3 ? 240 : guideMatches.length * 72}}rpx;"><button wx:for="{{guideMatches}}" wx:key="id" class="route-option" data-index="{{index}}" bindtap="chooseGuide">{{item.title}}</button></scroll-view>
+        <text wx:else class="choice-empty">没有找到岩场</text>
+      </view>
+    </view>
+    <text class="form-label">线路名称 *</text>
+    <view catchtap="keepMenuOpen">
+      <input class="field" value="{{routeQuery}}" maxlength="120" placeholder="输入路线" placeholder-class="field-placeholder" bindfocus="focusRoute" bindblur="closeMenuAfterBlur" bindinput="inputRoute" disabled="{{guideIndex < 0 || routesLoading || !!routesError}}" />
+      <view wx:if="{{routesLoading}}" class="route-status">正在读取线路…</view><view wx:elif="{{routesError}}" class="route-status">{{routesError}} <button bindtap="retryRoutes">重试</button></view>
+      <view wx:elif="{{activeMenu === 'route'}}" class="choice-menu">
+        <scroll-view wx:if="{{matches.length}}" scroll-y style="height: {{matches.length > 3 ? 240 : matches.length * 72}}rpx;"><button wx:for="{{matches}}" wx:key="routeName" class="route-option" data-index="{{index}}" bindtap="selectRoute">{{item.routeName}} {{item.grade}}</button></scroll-view>
+        <button wx:elif="{{routeQuery}}" class="route-option" bindtap="useManual">未找到，使用手动输入的名称</button>
+        <text wx:else class="choice-empty">该岩场暂无收录，请输入路线名称</text>
+      </view>
+    </view>
+    <text class="form-label">难度 *</text><picker range="{{grades}}" value="{{gradeIndex}}" bindchange="chooseGrade"><view class="field">{{gradeIndex < 0 ? '选择难度' : grades[gradeIndex]}}</view></picker>
+    <text class="form-label">攀爬方式 *</text><picker range="{{styles}}" range-key="label" value="{{styleIndex}}" bindchange="chooseStyle"><view class="field">{{styleIndex < 0 ? '选择顶绳或先锋' : styles[styleIndex].label}}</view></picker>
+    <text class="form-label">结果 *</text><picker range="{{results}}" range-key="label" value="{{resultIndex}}" bindchange="chooseResult"><view class="field">{{resultIndex < 0 ? '选择本次结果' : results[resultIndex].label}}</view></picker>
+    <text class="form-label">心得（选填）</text><textarea class="field note" value="{{note}}" maxlength="500" placeholder="记下路线心得" bindinput="inputNote" />
+    <button class="save" bindtap="submit" loading="{{saving}}" disabled="{{saving || loading}}">保存记录</button>
+  </block>
+</view>

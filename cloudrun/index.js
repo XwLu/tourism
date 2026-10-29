@@ -42,6 +42,22 @@ function createApp(database, moderation, env = process.env) {
     }
     response.json({ ok: true, data: await database.publishGuidebook(guide) });
   });
+  app.post('/api/admin/climbing-routes', requirePublisher, express.json({ limit: '1mb' }), async (request, response) => {
+    const { guideId, routes } = request.body || {};
+    const guide = (await database.listGuidebooks()).find((item) => item.id === guideId);
+    if (!guide || !Array.isArray(routes) || routes.length > 5000) throw new InputError('线路目录无效');
+    const keys = new Set();
+    const normalized = routes.map((route) => {
+      if (!route || (route.sectionId !== undefined && (typeof route.sectionId !== 'string' || (route.sectionId && !guide.sections.some((section) => section.id === route.sectionId && section.id !== 'intro')))) || typeof route.name !== 'string' || !route.name.trim() || route.name.trim().length > 120 || typeof route.grade !== 'string' || route.grade.length > 8) throw new InputError('线路目录无效');
+      const name = route.name.trim();
+      const routeKey = createHash('sha256').update(JSON.stringify([guideId, name.normalize('NFKC').toLowerCase().replace(/\s+/g, ' ').trim()])).digest('hex');
+      if (keys.has(routeKey)) throw new InputError('线路目录中存在重复线路');
+      keys.add(routeKey);
+      return { sectionId: route.sectionId || '', name, grade: route.grade, routeKey };
+    });
+    await database.replaceClimbingRoutes(guideId, normalized);
+    response.json({ ok: true, data: { guideId, count: normalized.length } });
+  });
   app.use((request, response, next) => {
     if (env.TRIP_PUBLISH_ONLY === 'true') return response.status(404).json({ ok: false, message: '接口暂时不存在' });
     next();

@@ -134,6 +134,12 @@
       ><view class="note-heading"><text class="note-star">✳</text><text>出发前，再看一眼</text></view
       ><text class="note-text">{{day.note}}</text></view
     >
+    <view class="climbing-entry">
+      <view class="section-heading"><text class="section-title">磕线记录</text><text class="section-caption">{{climbingRecords.length}} 条记录</text></view>
+      <text class="comments-description">记下今天攀爬的线路，记录每一次尝试。</text>
+      <view wx:for="{{climbingRecords}}" wx:key="id" class="climbing-record-row"><text>{{item.routeName}} · {{item.grade}} · {{item.styleLabel}} · {{item.resultLabel}}</text><button data-id="{{item.id}}" bindtap="deleteClimbingRecord">删除</button></view>
+      <button class="climbing-add" bindtap="openClimbingRecord">＋ 添加磕线记录</button>
+    </view>
     <view class="comments-section">
       <view class="section-heading">
         <text class="section-title">当天游玩反馈</text>

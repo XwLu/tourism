@@ -38,6 +38,31 @@ function createDatabase(env = process.env) {
       }
     },
     close: () => pool.end(),
+    async addClimbingRecord(record) {
+      await query(`INSERT INTO climbing_records (id, user_id, trip_id, day_id, guide_id, guide_title, section_id, section_title, route_name, route_key, grade, style, result, note, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE id = id`,
+      [record.id, record.userId, record.tripId, record.dayId, record.guideId, record.guideTitle, record.sectionId, record.sectionTitle, record.routeName, record.routeKey, record.grade, record.style, record.result, record.note, Date.now()]);
+    },
+    listClimbingRoutes(guideId) {
+      return query('SELECT route_name AS routeName, grade FROM climbing_routes WHERE guide_id = ? ORDER BY route_name', [guideId]);
+    },
+    async replaceClimbingRoutes(guideId, routes) {
+      const connection = await pool.getConnection();
+      try {
+        await connection.beginTransaction();
+        await connection.execute('DELETE FROM climbing_routes WHERE guide_id = ?', [guideId]);
+        for (const route of routes) await connection.execute('INSERT INTO climbing_routes (guide_id, section_id, route_key, route_name, grade) VALUES (?, ?, ?, ?, ?)', [guideId, route.sectionId, route.routeKey, route.name, route.grade]);
+        await connection.commit();
+      } catch (error) { await connection.rollback(); throw error; }
+      finally { connection.release(); }
+    },
+    listClimbingRecords(userId) {
+      return query(`SELECT id, trip_id AS tripId, day_id AS dayId, guide_id AS guideId, guide_title AS guideTitle, section_id AS sectionId, section_title AS sectionTitle, route_name AS routeName, route_key AS routeKey, grade, style, result, note, created_at AS createdAt FROM climbing_records WHERE user_id = ? ORDER BY created_at DESC, id DESC`, [userId]);
+    },
+    async deleteClimbingRecord(id, userId) {
+      const result = await query('DELETE FROM climbing_records WHERE id = ? AND user_id = ?', [id, userId]);
+      return result.affectedRows > 0;
+    },
     async publishGuidebook(guide) {
       const connection = await pool.getConnection();
       try {

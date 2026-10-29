@@ -2,6 +2,7 @@
 .codex/
 /cloudrun-deploy.zip
 /cloudrun-guidebook-deploy.zip
+/cloudrun-climbing-deploy.zip
 /trip-publisher-deploy.zip
 /cloudrun/node_modules/
 /cloudrun/generated-guidebooks/

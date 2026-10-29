@@ -1,5 +1,5 @@
 {
-  "pages": ["pages/home/index", "pages/guidebooks/index", "pages/saved/index", "pages/itinerary/index", "pages/guidebook-detail/index"],
+  "pages": ["pages/home/index", "pages/guidebooks/index", "pages/saved/index", "pages/climbing-profile/index", "pages/climbing-review/index", "pages/climbing-record/index", "pages/itinerary/index", "pages/guidebook-detail/index"],
   "window": {
     "backgroundColor": "#f8f7f4",
     "backgroundTextStyle": "dark",
@@ -15,7 +15,8 @@
     "list": [
       { "pagePath": "pages/home/index", "text": "发现行程" },
       { "pagePath": "pages/guidebooks/index", "text": "岩场路书" },
-      { "pagePath": "pages/saved/index", "text": "我的收藏" }
+      { "pagePath": "pages/saved/index", "text": "我的收藏" },
+      { "pagePath": "pages/climbing-profile/index", "text": "个人主页" }
     ]
   },
   "resolveAlias": { "~/*": "/*" },

@@ -1,0 +1,20 @@
+.review-scroll { width: 100%; }
+.review-page { padding: 30rpx 32rpx calc(60rpx + env(safe-area-inset-bottom)); }
+.review-title { display: block; margin-top: 18rpx; font-size: 42rpx; font-weight: 650; }
+.review-description { display: block; margin-top: 14rpx; color: #8b9186; font-size: 24rpx; line-height: 1.7; }
+.review-empty { margin-top: 28rpx; padding: 38rpx 24rpx; border-radius: 16rpx; background: #fffefa; color: #8a9386; font-size: 25rpx; text-align: center; }
+.select-block { margin-top: 28rpx; }
+.field-label { display: block; margin-bottom: 12rpx; font-size: 25rpx; font-weight: 600; }
+.select-input { box-sizing: border-box; display: block; width: 100%; height: 84rpx; padding: 0 22rpx; border: 1rpx solid #eeede6; border-radius: 14rpx; background: #fffefa; font-size: 26rpx; line-height: 84rpx; }
+.field-placeholder { color: #a1a299; }
+.choice-menu { overflow: hidden; margin-top: 6rpx; border: 1rpx solid #eeede6; border-radius: 14rpx; background: #fffefa; }
+.choice-empty { display: block; padding: 20rpx 22rpx; color: #969b91; font-size: 24rpx; }
+.route-choice { display: block; width: 100%; height: 72rpx; padding: 18rpx 22rpx; border-bottom: 1rpx solid #eeede6; background: #fffefa; color: #496454; text-align: left; font-size: 24rpx; line-height: 36rpx; }
+.query-button { margin-top: 30rpx; padding: 20rpx; border-radius: 16rpx; background: #3f5d4e; color: white; text-align: center; font-size: 26rpx; }
+.route-summary { margin-top: 28rpx; padding: 26rpx; border-radius: 16rpx; background: #fffefa; color: #53665a; font-size: 25rpx; line-height: 1.8; }
+.route-summary text { display: block; }
+.summary-heading { font-size: 29rpx; font-weight: 650; }
+.summary-spacer { margin-top: 24rpx; }
+.attempt { margin-top: 18rpx; padding-top: 16rpx; border-top: 1rpx solid #eeede6; font-size: 24rpx; }
+.attempt-time { color: #a0a398; font-size: 21rpx; }
+.attempt-note { margin-top: 8rpx; }
