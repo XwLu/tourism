@@ -7,7 +7,7 @@
     <block wx:else>
       <view id="guide-select" class="select-block" catchtap="keepMenuOpen">
         <text class="field-label">岩场</text>
-        <input class="select-input" value="{{guideSearch}}" placeholder="输入岩场" placeholder-class="field-placeholder" bindfocus="focusGuide" bindblur="closeMenuAfterBlur" bindinput="searchGuides" bindkeyboardheightchange="onKeyboardHeightChange" adjust-position="{{false}}" />
+        <input class="select-input" value="{{guideSearch}}" placeholder="输入岩场" placeholder-class="field-placeholder" bindfocus="focusGuide" bindinput="searchGuides" bindkeyboardheightchange="onKeyboardHeightChange" adjust-position="{{false}}" />
         <view wx:if="{{activeMenu === 'guide'}}" class="choice-menu">
           <scroll-view wx:if="{{guideMatches.length}}" scroll-y style="height: {{guideMatches.length > 3 ? 240 : guideMatches.length * 72}}rpx;"><button wx:for="{{guideMatches}}" wx:key="id" class="route-choice" data-index="{{index}}" bindtap="chooseGuide">{{item.title}}</button></scroll-view>
           <text wx:else class="choice-empty">没有找到已记录的岩场</text>
@@ -15,7 +15,7 @@
       </view>
       <view id="route-select" class="select-block" catchtap="keepMenuOpen">
         <text class="field-label">路线</text>
-        <input class="select-input" value="{{routeSearch}}" placeholder="输入路线" placeholder-class="field-placeholder" bindfocus="focusRoute" bindblur="closeMenuAfterBlur" bindinput="searchRoutes" bindkeyboardheightchange="onKeyboardHeightChange" adjust-position="{{false}}" disabled="{{guideIndex < 0}}" />
+        <input class="select-input" value="{{routeSearch}}" placeholder="输入路线" placeholder-class="field-placeholder" bindfocus="focusRoute" bindinput="searchRoutes" bindkeyboardheightchange="onKeyboardHeightChange" adjust-position="{{false}}" disabled="{{guideIndex < 0}}" />
         <view wx:if="{{activeMenu === 'route'}}" class="choice-menu">
           <scroll-view wx:if="{{routeMatches.length}}" scroll-y style="height: {{routeMatches.length > 3 ? 240 : routeMatches.length * 72}}rpx;"><button wx:for="{{routeMatches}}" wx:key="id" class="route-choice" data-index="{{index}}" bindtap="chooseRoute">{{item.title}}</button></scroll-view>
           <text wx:else class="choice-empty">没有找到已记录的线路</text>

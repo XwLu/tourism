@@ -6,7 +6,7 @@ Page({
   data: { guides: [], guideQuery: '', guideMatches: [], routes: [], matches: [], routeQuery: '', activeMenu: '', manual: false, routesLoading: false, routesError: '', guideIndex: -1, gradeIndex: -1, styleIndex: -1, resultIndex: -1, grades, styles, results, routeName: '', note: '', loading: true, saving: false, error: '' },
   onLoad(options) { this.tripId = options.tripId; this.dayId = options.dayId; this.loadGuides(); },
   onHide() { this.closeMenus(); },
-  onUnload() { clearTimeout(this.menuTimer); this.disposed = true; this.routesSequence = (this.routesSequence || 0) + 1; },
+  onUnload() { this.disposed = true; this.routesSequence = (this.routesSequence || 0) + 1; },
   async loadGuides() {
     this.setData({ loading: true, error: '' });
     try { const guides = await fetchGuidebooks(); this.setData({ guides, guideMatches: guides }); }
@@ -15,15 +15,9 @@ Page({
   },
   keepMenuOpen() {},
   closeMenus() {
-    clearTimeout(this.menuTimer);
     if (this.data.activeMenu) this.setData({ activeMenu: '' });
   },
-  closeMenuAfterBlur() {
-    clearTimeout(this.menuTimer);
-    this.menuTimer = setTimeout(() => this.setData({ activeMenu: '' }), 200);
-  },
   focusGuide() {
-    clearTimeout(this.menuTimer);
     this.setData({ activeMenu: 'guide', guideMatches: this.data.guides });
   },
   inputGuide(event) {
@@ -34,7 +28,6 @@ Page({
   async chooseGuide(event) {
     const guide = this.data.guideMatches[Number(event.currentTarget.dataset.index)];
     if (!guide) return;
-    clearTimeout(this.menuTimer);
     const guideIndex = this.data.guides.findIndex((item) => item.id === guide.id);
     this.setData({ guideIndex, guideQuery: guide.title, activeMenu: '', routes: [], matches: [], routeQuery: '', routeName: '', gradeIndex: -1, manual: false });
     await this.loadRoutes(guide.id);
@@ -55,7 +48,6 @@ Page({
   chooseStyle(event) { this.setData({ styleIndex: Number(event.detail.value) }); },
   chooseResult(event) { this.setData({ resultIndex: Number(event.detail.value) }); },
   focusRoute() {
-    clearTimeout(this.menuTimer);
     this.setData({ activeMenu: 'route', matches: this.data.routes });
   },
   inputRoute(event) {
@@ -65,13 +57,11 @@ Page({
   selectRoute(event) {
     const route = this.data.matches[Number(event.currentTarget.dataset.index)];
     if (route) {
-      clearTimeout(this.menuTimer);
       this.setData({ routeName: route.routeName, routeQuery: route.routeName, matches: [], activeMenu: '', manual: false, gradeIndex: grades.indexOf(route.grade) });
     }
   },
   useManual() {
     if (!this.data.routesLoading && !this.data.routesError) {
-      clearTimeout(this.menuTimer);
       this.setData({ manual: true, routeName: this.data.routeQuery.trim(), matches: [], activeMenu: '' });
     }
   },

@@ -3,6 +3,7 @@ import { fetchGuidebooks } from '../../utils/guidebooks';
 const guideCovers = {
   meigu: 'https://7072-prod-d7gikpjuqf33d2a1c-1512169535.tcb.qcloud.la/travel_pic/dongyang-meigu.jpg',
   'linan-shiziyan': 'https://7072-prod-d7gikpjuqf33d2a1c-1512169535.tcb.qcloud.la/travel_pic/linan-shiziyan.jpg',
+  'quzhou-liangtoudong': 'https://7072-prod-d7gikpjuqf33d2a1c-1512169535.tcb.qcloud.la/travel_pic/quzhou-liangtoudong.jpg',
   'xinchang-baizhangyan': 'https://7072-prod-d7gikpjuqf33d2a1c-1512169535.tcb.qcloud.la/travel_pic/xinchang-baizhangyan.jpg',
   'xinchang-shigoudong': '/static/travel/xinchang-shigoudong.jpg',
   'xinchang-tiandiyan': '/static/travel/xinchang-tiandiyan.jpg',

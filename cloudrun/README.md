@@ -168,7 +168,7 @@ SELECT section_id, intro FROM climbing_guidebook_section_intros WHERE guide_id =
 ```sh
 cd /Users/looyifan/Workspace/tourism/cloudrun
 python3 -m pip install pypdfium2 Pillow
-python3 scripts/prepare-guidebook.py '/Users/looyifan/Downloads/梅谷路书.pdf' --id meigu --title '梅谷岩场' --location '浙江 · 金华 · 东阳' --description '水库旁的峡谷岩场，包含东西两侧岩壁与线路资料。路书更新于 2026 年 6 月。' --layout guidebooks/meigu-layout.json --sections guidebooks/meigu-sections.json --output generated-guidebooks/meigu.json
+python3 scripts/prepare-guidebook.py '/Users/looyifan/Downloads/梅谷路书.pdf' --id meigu --title '东阳梅谷' --location '浙江 · 金华 · 东阳' --description '水库旁的峡谷岩场，包含东西两侧岩壁与线路资料。路书更新于 2026 年 6 月。' --layout guidebooks/meigu-layout.json --sections guidebooks/meigu-sections.json --output generated-guidebooks/meigu.json
 node --env-file="$HOME/.config/tourism/publish.env" scripts/publish-guidebook.mjs generated-guidebooks/meigu.json
 ```
 

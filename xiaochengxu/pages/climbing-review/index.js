@@ -10,7 +10,7 @@ Page({
     this.load();
   },
   onHide() { this.closeMenus(); },
-  onUnload() { this.disposed = true; clearTimeout(this.menuTimer); clearTimeout(this.scrollTimer); },
+  onUnload() { this.disposed = true; clearTimeout(this.scrollTimer); },
   async onPullDownRefresh() { await this.load(); wx.stopPullDownRefresh(); },
   async load() {
     if (this.requesting) return;
@@ -27,12 +27,7 @@ Page({
   },
   keepMenuOpen() {},
   closeMenus() {
-    clearTimeout(this.menuTimer);
     if (this.data.activeMenu) this.setData({ activeMenu: '' });
-  },
-  closeMenuAfterBlur() {
-    clearTimeout(this.menuTimer);
-    this.menuTimer = setTimeout(() => { if (!this.disposed) this.setData({ activeMenu: '' }); }, 200);
   },
   revealActiveField() {
     const target = this.data.activeMenu === 'guide' ? 'guide-select' : this.data.activeMenu === 'route' ? 'route-select' : '';
@@ -47,8 +42,8 @@ Page({
     this.keyboardHeight = keyboardHeight;
     this.setData({ scrollHeight: Math.max(160, this.windowHeight - keyboardHeight) }, () => { if (keyboardHeight) this.revealActiveField(); });
   },
-  focusGuide() { clearTimeout(this.menuTimer); this.setData({ activeMenu: 'guide', guideMatches: this.data.guides }, () => { if (this.keyboardHeight) this.revealActiveField(); }); },
-  focusRoute() { clearTimeout(this.menuTimer); this.setData({ activeMenu: 'route', routeMatches: this.data.routes }, () => { if (this.keyboardHeight) this.revealActiveField(); }); },
+  focusGuide() { this.setData({ activeMenu: 'guide', guideMatches: this.data.guides }, () => { if (this.keyboardHeight) this.revealActiveField(); }); },
+  focusRoute() { this.setData({ activeMenu: 'route', routeMatches: this.data.routes }, () => { if (this.keyboardHeight) this.revealActiveField(); }); },
   searchGuides(event) {
     const guideSearch = event.detail.value;
     this.setData({ guideSearch, guideMatches: this.data.guides.filter((item) => item.title.toLowerCase().includes(guideSearch.trim().toLowerCase())), activeMenu: 'guide', guideIndex: -1, routeIndex: -1, routes: [], routeSearch: '', routeMatches: [], routeStats: null, routeRecords: [], routeNotes: [] });
@@ -56,7 +51,6 @@ Page({
   chooseGuide(event) {
     const selected = this.data.guideMatches[Number(event.currentTarget.dataset.index)];
     if (!selected) return;
-    clearTimeout(this.menuTimer);
     const guideIndex = this.data.guides.findIndex((item) => item.id === selected.id);
     const routes = [...new Map(this.data.records.filter((item) => item.guideId === selected.id).map((item) => [item.routeKey, { id: item.routeKey, title: item.routeName }])).values()];
     this.setData({ guideIndex, guideSearch: selected.title, guideMatches: [], activeMenu: '', routes, routeIndex: -1, routeSearch: '', routeMatches: routes, routeRecords: [], routeNotes: [], routeStats: null });
@@ -69,7 +63,6 @@ Page({
   chooseRoute(event) {
     const route = this.data.routeMatches[Number(event.currentTarget.dataset.index)];
     if (!route) return;
-    clearTimeout(this.menuTimer);
     this.setData({ routeIndex: this.data.routes.findIndex((item) => item.id === route.id), routeSearch: route.title, routeMatches: [], activeMenu: '', routeStats: null, routeRecords: [], routeNotes: [] });
     wx.hideKeyboard();
   },
