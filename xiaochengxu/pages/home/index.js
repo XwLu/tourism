@@ -47,7 +47,7 @@ Page({
   updateCards() {
     this.setData({
       tripCount: getTrips().length,
-      ...getCardColumns({ keyword: this.data.keyword, category: this.data.category }),
+      ...getCardColumns({ keyword: this.data.keyword, category: this.data.category, newestFirst: true }),
     });
   },
   onSearch(event) {

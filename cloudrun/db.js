@@ -2,6 +2,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const mysql = require('mysql2/promise');
 const { isDeepStrictEqual } = require('node:util');
+const { climbingDayDates } = require('./trip-content');
 
 function createDatabase(env = process.env) {
   const required = ['MYSQL_ADDRESS', 'MYSQL_USERNAME', 'MYSQL_PASSWORD'];
@@ -56,8 +57,13 @@ function createDatabase(env = process.env) {
       } catch (error) { await connection.rollback(); throw error; }
       finally { connection.release(); }
     },
-    listClimbingRecords(userId) {
-      return query(`SELECT id, trip_id AS tripId, day_id AS dayId, guide_id AS guideId, guide_title AS guideTitle, section_id AS sectionId, section_title AS sectionTitle, route_name AS routeName, route_key AS routeKey, grade, style, result, note, created_at AS createdAt FROM climbing_records WHERE user_id = ? ORDER BY created_at DESC, id DESC`, [userId]);
+    async listClimbingRecords(userId) {
+      const [records, trips] = await Promise.all([
+        query(`SELECT id, trip_id AS tripId, day_id AS dayId, guide_id AS guideId, guide_title AS guideTitle, section_id AS sectionId, section_title AS sectionTitle, route_name AS routeName, route_key AS routeKey, grade, style, result, note, created_at AS createdAt FROM climbing_records WHERE user_id = ? ORDER BY created_at DESC, id DESC`, [userId]),
+        query('SELECT trip.trip_id AS id, trip.content FROM travel_trips trip WHERE EXISTS (SELECT 1 FROM climbing_records record WHERE record.user_id = ? AND record.trip_id = trip.trip_id)', [userId]),
+      ]);
+      const dates = new Map(trips.map((row) => [row.id, climbingDayDates(typeof row.content === 'string' ? JSON.parse(row.content) : row.content)]));
+      return records.map((record) => ({ ...record, climbingDate: dates.get(record.tripId)?.get(record.dayId) || null }));
     },
     async deleteClimbingRecord(id, userId) {
       const result = await query('DELETE FROM climbing_records WHERE id = ? AND user_id = ?', [id, userId]);

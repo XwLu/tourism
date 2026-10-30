@@ -1,3 +1,24 @@
+function climbingDayDates(trip) {
+  const startYear = typeof trip?.dates === 'string' ? trip.dates.match(/\b(\d{4})\b/) : null;
+  if (!startYear || !Array.isArray(trip.days)) return new Map();
+  let year = Number(startYear[1]);
+  let previousMonth = 0;
+  const dates = new Map();
+  for (const day of trip.days) {
+    const match = typeof day.date === 'string' ? day.date.match(/^(?:(\d{4})\s*年\s*)?(\d{1,2})\s*月\s*(\d{1,2})\s*日$/) : null;
+    if (!match) continue;
+    const month = Number(match[2]);
+    const date = Number(match[3]);
+    if (match[1]) year = Number(match[1]);
+    else if (previousMonth && month < previousMonth) year += 1;
+    const calendarDate = new Date(Date.UTC(year, month - 1, date));
+    if (calendarDate.getUTCFullYear() !== year || calendarDate.getUTCMonth() !== month - 1 || calendarDate.getUTCDate() !== date) continue;
+    dates.set(day.id, `${year}-${String(month).padStart(2, '0')}-${String(date).padStart(2, '0')}`);
+    previousMonth = month;
+  }
+  return dates;
+}
+
 function normalizeTrips(trips) {
   if (!Array.isArray(trips)) throw new Error('行程列表必须是数组');
   const tripIds = new Set();
@@ -81,4 +102,4 @@ function normalizeTrips(trips) {
   });
 }
 
-module.exports = { normalizeTrips };
+module.exports = { normalizeTrips, climbingDayDates };

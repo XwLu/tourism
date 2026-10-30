@@ -1,7 +1,7 @@
 import { requestCommunity, saveCommunityProfile } from '../../utils/community';
 import { labelRecord, weeklyClimbingTotals } from '../../utils/climbing';
 Page({
-  data: { profile: null, records: [], chartWeeks: [], activityCount: 0, topropeCount: 0, leadCount: 0, redpointCount: 0, loading: false, error: '', avatar: '', nickName: '', saving: false },
+  data: { profile: null, records: [], chartWeeks: [], missingClimbingDates: false, activityCount: 0, topropeCount: 0, leadCount: 0, redpointCount: 0, loading: false, error: '', avatar: '', nickName: '', saving: false },
   onShow() {
     if (typeof this.getTabBar === 'function') this.getTabBar()?.setData({ selected: 'pages/climbing-profile/index' });
     this.load();
@@ -13,7 +13,7 @@ Page({
     try {
       const data = await requestCommunity('climbingRecords');
       const records = data.records.map(labelRecord);
-      this.setData({ profile: data.profile, records, chartWeeks: weeklyClimbingTotals(records), activityCount: new Set(records.map((record) => record.tripId)).size, topropeCount: records.filter((record) => record.style === 'toprope').length, leadCount: records.filter((record) => record.style === 'lead').length, redpointCount: new Set(records.filter((record) => record.style === 'lead' && ['onsight', 'flash', 'redpoint'].includes(record.result)).map((record) => record.routeKey)).size }, () => this.drawChart());
+      this.setData({ profile: data.profile, records, chartWeeks: weeklyClimbingTotals(records), missingClimbingDates: records.some((record) => !record.climbingDate), activityCount: new Set(records.map((record) => record.tripId)).size, topropeCount: records.filter((record) => record.style === 'toprope').length, leadCount: records.filter((record) => record.style === 'lead').length, redpointCount: new Set(records.filter((record) => record.style === 'lead' && ['onsight', 'flash', 'redpoint'].includes(record.result)).map((record) => record.routeKey)).size }, () => this.drawChart());
     } catch (error) { this.setData({ error: error.message }); }
     finally { this.setData({ loading: false }); }
   },

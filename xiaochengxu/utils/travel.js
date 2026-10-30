@@ -36,7 +36,7 @@ export function toggleSaved(id) {
   }
 }
 
-export function getCardColumns({ keyword = '', category = 'all', savedOnly = false } = {}) {
+export function getCardColumns({ keyword = '', category = 'all', savedOnly = false, newestFirst = false } = {}) {
   const savedIds = getSavedIds();
   const search = keyword.trim().toLowerCase();
   const cards = getTrips()
@@ -56,6 +56,16 @@ export function getCardColumns({ keyword = '', category = 'all', savedOnly = fal
         .includes(search),
     )
     .map((trip) => ({ ...trip, isSaved: savedIds.includes(trip.id) }));
+  if (newestFirst) {
+    const startDate = (trip) => {
+      const match = trip.dates.match(/(\d{4})[.\-/年]\s*(\d{1,2})[.\-/月]\s*(\d{1,2})/);
+      if (!match) return -Infinity;
+      const year = Number(match[1]), month = Number(match[2]), day = Number(match[3]);
+      const date = new Date(Date.UTC(year, month - 1, day));
+      return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day ? date.getTime() : -Infinity;
+    };
+    cards.sort((left, right) => startDate(right) - startDate(left));
+  }
   return {
     leftColumn: cards.filter((trip, index) => index % 2 === 0),
     rightColumn: cards.filter((trip, index) => index % 2 === 1),

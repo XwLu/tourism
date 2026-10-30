@@ -6,7 +6,7 @@
   <view class="section-heading"><text class="section-title">数据统计</text></view>
   <view class="stats"><view><text>{{activityCount}}</text><text>参加活动</text></view><view><text>{{topropeCount}}</text><text>顶绳次数</text></view><view><text>{{leadCount}}</text><text>先锋次数</text></view><view><text>{{redpointCount}}</text><text>红点路线</text></view></view>
   <view class="section-heading"><text class="section-title">攀爬次数趋势</text><text class="section-caption">每 7 天累计</text></view>
-  <view class="chart-card"><view class="chart-legend"><text class="legend-total">● 合计</text><text class="legend-lead">● 先锋</text><text class="legend-toprope">● 顶绳</text></view><canvas id="climbing-chart" type="2d" class="chart" /><text class="chart-caption">{{chartWeeks.length ? '从首条记录开始 · 按保存日期统计' : '暂无攀爬记录'}}</text></view>
+  <view class="chart-card"><view class="chart-legend"><text class="legend-total">● 合计</text><text class="legend-lead">● 先锋</text><text class="legend-toprope">● 顶绳</text></view><canvas id="climbing-chart" type="2d" class="chart" /><text class="chart-caption">{{missingClimbingDates ? '部分记录缺少活动日期，暂未计入趋势' : chartWeeks.length ? '从首次攀爬开始 · 按活动日期统计' : '暂无攀爬记录'}}</text></view>
   <view class="section-heading"><text class="section-title">路线回顾</text></view>
   <view wx:if="{{!loading && !error && !records.length}}" class="climbing-empty">暂时还没有攀爬记录哦～</view>
   <button class="review-button" bindtap="openReview">查询路线记录 ›</button>
